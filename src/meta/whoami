@@ -1,0 +1,4 @@
+{
+  "roots": ["/io/messages"],
+  "hosts": ["vtexcommerce.com.br", "vtexcommercebeta.com.br"]
+}
