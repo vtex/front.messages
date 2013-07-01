@@ -1,8 +1,17 @@
 files = [
 	JASMINE,
 	JASMINE_ADAPTER,
-	'build/js/people.js',
-	'build/spec/**/*.js'
+	'build/lib/jquery-1.8.3.min.js',
+	'build/lib/underscore-min.js',
+	'build/js/vtex-message.js',
+	'build/spec/helpers/jasmine-jquery.js',
+	{
+		pattern: 'build/spec/fixtures/**/*.html',
+		watched: true,
+		included: false,
+		served: true
+	},
+	'build/spec/*.js'
 ];
 browsers = [
 	'PhantomJS'

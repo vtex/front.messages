@@ -25,6 +25,12 @@ module.exports = (grunt) ->
 				src: ['**', '!includes/**', '!coffee/**', '!**/*.less']
 				dest: 'build/<%= relativePath %>'
 
+			test: 
+				expand: true
+				cwd: 'spec/'
+				src: ['**', '!**/*.coffee']
+				dest: 'build/<%= relativePath %>/spec/'
+
 			debug:
 				src: ['src/index.html']
 				dest: 'build/<%= relativePath %>/index.debug.html'
@@ -112,7 +118,7 @@ module.exports = (grunt) ->
 				tasks: ['prod']
 
 			test:
-				files: ['src/**/*.html', 'src/**/*.coffee', 'src/**/*.js', 'src/**/*.less', 'spec/**/*.coffee']
+				files: ['src/**/*.html', 'src/**/*.coffee', 'src/**/*.js', 'src/**/*.less', 'spec/**/*.*']
 				tasks: ['dev', 'karma:unit:run']
 
 	grunt.loadNpmTasks 'grunt-contrib-connect'
@@ -131,7 +137,7 @@ module.exports = (grunt) ->
 	grunt.registerTask 'default', ['dev-watch']
 
 	# Dev
-	grunt.registerTask 'dev', ['clean', 'copy:main', 'coffee', 'less']
+	grunt.registerTask 'dev', ['clean', 'copy:main', 'copy:test', 'coffee', 'less']
 	grunt.registerTask 'dev-watch', ['dev', 'connect', 'remote', 'watch:dev']
 
 	# Prod - minifies files
@@ -142,6 +148,9 @@ module.exports = (grunt) ->
 	grunt.registerTask 'test', ['dev', 'karma:deploy']
 	grunt.registerTask 'test-watch', ['dev', 'karma:unit', 'watch:test']
 
+	# TDD
+	grunt.registerTask 'tdd', ['dev', 'connect', 'remote', 'karma:unit', 'watch:test']
+	
 	# Generates version folder
 	grunt.registerTask 'gen-version', ->
 		grunt.log.writeln 'Deploying to environmentName: '.cyan + grunt.config('environmentName').green
