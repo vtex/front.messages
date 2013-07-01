@@ -90,10 +90,10 @@ module.exports = (grunt) ->
 				options:
 					replacements: [
 						pattern: /src="(\.\.\/)?(?!http|\/|\/\/|\#)/ig
-						replacement: 'src="<%= resourceToken %>/<%= acronym %>/'
+						replacement: 'src="/io/messages/'
 					,
 						pattern: /href="(\.\.\/)?(?!http|\/|\/\/|\#)/ig
-						replacement: 'href="<%= resourceToken %>/<%= acronym %>/'
+						replacement: 'href="/io/messages/'
 					,
 						pattern: '<script src="http://localhost:35729/livereload.js"></script>'
 						replacement: ''
