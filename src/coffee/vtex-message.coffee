@@ -146,6 +146,7 @@ class Messages
 		for message, i in @messagesArray
 			for res in results
 				if message.id is res.id
+					message.domElement.remove()
 					@messagesArray.splice(i,1)
 					return
 

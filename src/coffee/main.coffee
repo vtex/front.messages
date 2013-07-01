@@ -6,11 +6,11 @@ $ ->
 			title: 'Erro 1!'
 			detail: 'Ocorreu um erro inesperado nos nossos servidores.'
 		type: 'fatal'		
-	window.message1 = messages.addMessage(message)
+	window.message1 = messages.addMessage(message, true)
 
 	message = 
 		content: 
 			title: 'Erro 2'
 			detail: 'Ocorreu um erro inesperado nos nossos servidores.'
 		type: 'info'		
-	window.message2 = messages.addMessage(message)
+	window.message2 = messages.addMessage(message, true)

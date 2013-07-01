@@ -64,6 +64,16 @@ describe 'Messages', ->
 			expect(message.type).toEqual("info")
 			expect($(message.domElement, message.placeholder)).not.toBeVisible()
 
+		it 'should remove a specific Message using its object', ->
+			# Arrange
+			mes = messages.addMessage()
+		
+			# Act
+			messages.removeMessage(mes)
+		
+			# Assert
+			expect(messages.messagesArray.length).toBe(0)
+
 		it 'should show a Message', ->
 			# Arrange
 			message = messages.addMessage()
@@ -191,3 +201,17 @@ describe 'Messages', ->
 			# Assert
 			expect(message.visible).toBe(true)
 			expect($(message.domElement,message.placeholder)).toBeVisible()
+
+		it 'should destroy a message dom element after removal', ->
+			# Arrange
+			messProp = messages.addMessage({}, true)
+			message = messages.addMessage({}, true)		
+			expect($(messProp.domElement,messProp.placeholder)).toBeVisible()
+			expect($(message.domElement,message.placeholder)).toBeVisible()
+		
+			# Act
+			messages.removeMessage(message)
+		
+			# Assert
+			expect($(messProp.domElement,messProp.placeholder)).toExist()
+			expect($(message.domElement,message.placeholder)).not.toExist()

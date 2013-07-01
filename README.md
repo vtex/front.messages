@@ -1,52 +1,116 @@
-# Speedbag
+# VTEX Message
 
-A grunt coffee/less/live-reload/cssmin/uglify/connect/bootstrap/zepto/lodash boilerplate.
 
-Check out the [live demo](http://vtex.github.io/speedbag)
+Exemplo de uso:
+```javascript
+$(document).ready(function(){
+	var messsages, messageObj, message;
+	messages = new window.vtex.Messages();
 
-Requires [node](http://nodejs.org/) and [grunt](http://gruntjs.com/) (`npm i -g grunt-cli`).
+	messageObj = {
+		content: 
+			title: 'Erro 1!',
+			detail: 'Ocorreu um erro inesperado em nos nossos servidores.'
+		type: 'fatal'
+	};
+	message1 = messages.addMessage(message, true);	
+});
+```
+====
 
-### Speedstart
+Baixe o repositório e instale as dependências:
 
-    npm i
-    grunt
+```console
+npm i -g grunt-cli
+npm i
+grunt
+```
 
-Have fun! Changes to your coffee, less or html files will reload the page automatically. Nice.
+Você poderá vê-lo em ação em `http://localhost:9001/`.
 
-The compiled files can be found in the `/build` folder.
+## API
 
-### Production build
+### Messages
 
-    grunt prod
+<h4 id="Messages()"><code>window.vtex.Messages()</code></h4>
+<p>Retorna uma instância de Messages.</p>
 
-### Deployment build
+<h4 id="messagesArray"><code>.messagesArray</code></h4>
+<p>Array onde é guardado todas as mensagens.</p>
 
-    DEPLOY_ENV=beta GIT_COMMIT=`git rev-parse --verify HEAD` grunt deploy
+<h4 id="addMessage"><code>.addMessage(message, visible)</code></h4>
+<p>Adiciona uma mensagem nova ao objeto de Messages.</p>
+<table class="table table-bordered table-striped">
+	<thead>
+		<tr>
+			<th style="width: 90px;">Param</th>
+			<th style="width: 50px;">tipo</th>
+			<th style="width: 140px;">exemplo</th>
+			<th>descrição</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>message</td>
+			<td>object</td>
+			<td><a href="#message">message</a></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>visible</td>
+			<td>boolean</td>
+			<td><code>true</code></td>
+			<td></td>
+		</tr>
+	</tbody>
+</table>
 
-Have a look at the newly created deploy/master/index.html file.
+### Message
 
-### Folder structure
+```javascript
+// Modelo de Message
+{
+	id: 'id unico da Message',
+	placeholder: 'seletor CSS do local onde será inserido a Message',
+	modalPlaceholder: 'seletor CSS do local onde será inserido o Modal',
+	template: 'seletor CSS do template da message',
+	modalTemplate: 'seletor CSS do template da modal message',
+	content:
+		title: 'título da message',
+		detail: 'mensagem da message'
+	type: 'tipo da message (caso seja "fatal", sera exibida como modal)',
+	visible: 'caso true a message sera exibida apos ser adicionada',
+	usingModal: 'caso seja true sera exibida como modal',
+	domElement: 'propriedade que será preenchida com o elemento do DOM da message',
+	insertMethod: 'método de inserção da mensagem no placeholder (ex: html, append, prepend, etc)'
+}
 
-- `src` - most of your files will be here.
-	- `coffee` - CoffeeScript source files
-	- `style` - CSS and LESS source files
-	- `lib` - Third-party libs
-	- `index.html` - Your app entry point.
-- `spec` - Unit tests source files.
-- `Gruntfile.coffee` - This is the configuration file for grunt. Contains all the build tasks.
-- `remote.json` - The configuration file for [Remote](https://github.com/gadr90/remote), if you need it.
-- `build` - this folder will be created after you run a grunt task.
-	-   `index.debug.html` - this is the same index as generated on the dev task. Useful for debugging in production.
-- `deploy` - this folder contains a deploy-ready, commit-hash-versioned folder of your app
-    -   `<git-commit-hash>` - the name of this folder is the hash of your current commit
-    -   `versions/<env>` - this folder contains a deployable version of your app
+// Default
+{
+	id: _.uniqueId('vtex-message-')
+	placeholder: '.vtex-message-placeholder'
+	modalPlaceholder: 'body'
+	template: '.vtex-message-template.vtex-message-template-default'
+	modalTemplate: '.vtex-message-template.vtex-message-template-modal-default'
+	content:
+		title: ''
+		detail: ''
+	type: 'info'
+	visible: false
+	usingModal: false
+	domElement: $()
+	insertMethod: 'append'
+}
+```
 
-------
 
-### Common issues:
 
-**EADDRINUSE** - Someone is already using one of the ports used by this app, either [connect](https://github.com/gruntjs/grunt-contrib-connect)'s 9001 or [LiveReload](https://github.com/gruntjs/grunt-contrib-livereload)'s 35729.
-Shut down interfering services or change the ports on Gruntfile.coffee.
+<br>
+
+Dependências:
+- jQuery
+- Bootstrap
+- Underscore
 
 ------
 
