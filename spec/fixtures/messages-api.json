@@ -1,0 +1,9 @@
+{
+	"messages": [
+		{
+			"text": "Erro qualquer",
+			"code": "123",
+			"status": "fatal"
+		}
+	]
+}
