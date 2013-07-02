@@ -37,7 +37,7 @@ class Message
 			<div class="modal-body">
 				<p class="vtex-message-detail"></p>
 			</div>
-        </div>
+		</div>
 		"""
 
 		defaultTemplate = """
@@ -135,6 +135,8 @@ class Messages
 		_.extend(@, defaultProperties, options)
 		@messagesArray = []
 
+		@bindAjaxError() if @ajaxError
+
 	addMessage: (message, show = false) =>
 		messageObj = new Message(message)
 		@messagesArray.push messageObj
@@ -149,5 +151,52 @@ class Messages
 					@messagesArray.splice(i,1)
 					return
 
+	bindAjaxError: ->
+		$(document).ajaxError (event, xhr, ajaxOptions, thrownError) =>
+			return if xhr.status is 401 or xhr.status is 403
+			# If refresh in the middle of an AJAX
+			if xhr.readyState is 0 or xhr.status is 0 then return
+			
+			if window.i18n
+				globalUnknownError = window.i18n.t('global.unkownError')
+				globalError = window.i18n.t('global.error')
+			else
+				globalUnknownError = "An unexpected error ocurred."
+				globalError = "Error"
+
+			if xhr.getResponseHeader('x-vtex-operation-id')
+				globalError += ' <small>(Operation ID ' + decodeURIComponent(xhr.getResponseHeader('x-vtex-operation-id')) + ')</small>'
+			errorMessage = if xhr.getResponseHeader('x-vtex-error-message') then JSON.parse(xhr.responseText).error.message else globalUnknownError
+
+			# Exibe mensagem na tela
+			messageObj =
+				type: 'fatal'
+				content:
+					title: globalError	
+					detail: errorMessage
+
+			if getCookie("ShowFullError") is "Value=1"
+				iframe = document.createElement('iframe')				
+				iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(xhr.responseText)
+				$(iframe).css('width', '100%')
+				$(iframe).css('height', '900px')
+				messageObj.content.detail = iframe
+
+			@addMessage(messageObj, true)
+
+	getCookie = (name) ->
+		cookieValue = null
+		if document.cookie and document.cookie isnt ""
+			cookies = document.cookie.split(";")
+			i = 0
+
+			while i < cookies.length
+				cookie = (cookies[i] or "").replace(/^\s+|\s+$/g, "")
+				if cookie.substring(0, name.length + 1) is (name + "=")
+					cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
+					break
+				i++
+		cookieValue
+		
 # exports
 root.vtex.Messages = Messages

@@ -1,5 +1,5 @@
 $ ->
-	window.messages = new window.vtex.Messages()
+	window.messages = new window.vtex.Messages({ajaxError:true})
 
 	message = 
 		content: 
@@ -14,3 +14,5 @@ $ ->
 			detail: 'Ocorreu um erro inesperado nos nossos servidores.'
 		type: 'info'		
 	window.message2 = messages.addMessage(message)
+
+	$.ajax("http://staples.vtexlocal.com.br/Site/OutrasFormasPagamento.aspx?IdSku=2008124&PopupComum=true")

@@ -191,3 +191,32 @@ describe 'Messages', ->
 			# Assert
 			expect(message.visible).toBe(true)
 			expect($(message.domElement,message.placeholder)).toBeVisible()
+
+	describe 'AJAX', ->
+
+		#jasmine.Ajax.useMock()
+
+		it 'should show modal Message when an AJAX error occurs', ->
+			# Arrange
+			messages = new window.vtex.Messages({ajaxError: true})
+		
+			# Act
+		
+			# Assert
+
+			###
+			onSuccess = jasmine.createSpy('onSuccess');
+			onFailure = jasmine.createSpy('onFailure');
+
+			foursquare = new FoursquareVenueSearch();
+
+			foursquare.search('40.019461,-105.273296', {
+				onSuccess: onSuccess,
+				onFailure: onFailure
+			});
+
+			request = mostRecentAjaxRequest();
+			expect(request.url).toBe('venues/search');
+			expect(request.method).toBe('POST');
+			expect(request.data()).toEqual({latLng: ['40.019461, -105.273296']});
+			###
