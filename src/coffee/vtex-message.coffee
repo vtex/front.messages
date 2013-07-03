@@ -1,6 +1,11 @@
 root = exports ? window
 window.vtex or = {}
 
+###
+# Classe Message, que representa uma mensagem
+# @class Message
+# @constructor
+###
 class Message
 	constructor: (options = {}) ->
 		classes =			
@@ -85,6 +90,12 @@ class Message
 
 		return
 
+	###
+	# Exibe a mensagem da tela
+	# @method show
+	# @param {Object|Number} fadeInObj caso preenchido, será passado como parametro para o método fadeIn do jQuery
+	# @return 
+	###
 	show: (fadeInObj) =>
 		if @usingModal
 			visibleModal = $('.modal:visible')
@@ -110,6 +121,12 @@ class Message
 			@domElement.show()
 			@visible = true
 
+	###
+	# Esconde a mensagem da tela
+	# @method hide
+	# @param {Object|Number} fadeOutObj caso preenchido, será passado como parametro para o método fadeOut do jQuery
+	# @return 
+	###
 	hide: (fadeOutObj) =>
 		if @usingModal
 			@domElement.modal('hide')
@@ -128,21 +145,44 @@ class Message
 		else
 			@domElement.hide()
 			@visible = false
-
+###
+# Classe Messages, que agrupa todas as mensagens
+# @class Messages
+# @constructor
+###
 class Messages
+	###
+	# Construtor
+	# @param {Object} options propriedades a ser extendida pelo plugin
+	# @return {Object} Messages
+	###
 	constructor: (options = {}) ->
-		defaultProperties = {}
+		defaultProperties = 
+			ajaxError: false
+			messagesArray: []
 		_.extend(@, defaultProperties, options)
-		@messagesArray = []
 
 		@bindAjaxError() if @ajaxError
 
+	###
+	# Adiciona uma mensagem ao objeto Messages, exibe caso passado show como true
+	# @method addMessage
+	# @param {Object} message
+	# @param {Boolean} show boolean 
+	# @returns {Object} retorna a instancia da Message criada
+	###
 	addMessage: (message, show = false) =>
 		messageObj = new Message(message)
 		@messagesArray.push messageObj
 		messageObj.show(show) if show
 		return messageObj
 
+	###
+	# Remove uma mensagem
+	# @method removeMessage
+	# @param {Object} messageProperty objeto Message ou objeto com alguma propriedade da mensagem a ser removida
+	# @returns
+	###
 	removeMessage: (messageProperty) =>
 		results = _.where(@messagesArray, messageProperty)
 		for message, i in @messagesArray
@@ -151,6 +191,12 @@ class Messages
 					@messagesArray.splice(i,1)
 					return
 
+	###
+	# Bind erros de Ajax para exibir modal de erro
+	# @method bindAjaxError
+	# @param 
+	# @returns 
+	###
 	bindAjaxError: ->
 		$(document).ajaxError (event, xhr, ajaxOptions, thrownError) =>
 			return if xhr.status is 401 or xhr.status is 403
@@ -176,7 +222,7 @@ class Messages
 					detail: errorMessage
 
 			if getCookie("ShowFullError") is "Value=1"
-				iframe = document.createElement('iframe')				
+				iframe = document.createElement('iframe')
 				iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(xhr.responseText)
 				$(iframe).css('width', '100%')
 				$(iframe).css('height', '900px')
@@ -184,6 +230,11 @@ class Messages
 
 			@addMessage(messageObj, true)
 
+	###
+	# Get cookie
+	# @param {String} nome do cookie
+	# @returns {String|null} valor do cookie
+	###
 	getCookie = (name) ->
 		cookieValue = null
 		if document.cookie and document.cookie isnt ""
