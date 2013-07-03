@@ -1,7 +1,7 @@
 root = exports ? window
 window.vtex or = {}
 
-###
+###*
 # Classe Message, que representa uma mensagem
 # @class Message
 # @constructor
@@ -90,10 +90,11 @@ class Message
 
 		return
 
-	###
+	###*
 	# Exibe a mensagem da tela
 	# @method show
-	# @param {Object|Number} fadeInObj caso preenchido, será passado como parametro para o método fadeIn do jQuery
+	# @param {Object|Number} fadeInObj caso preenchido, será passado como parametro para o método 
+	#[fadeIn do jQuery](http://api.jquery.com/fadeIn/)
 	# @return 
 	###
 	show: (fadeInObj) =>
@@ -121,10 +122,11 @@ class Message
 			@domElement.show()
 			@visible = true
 
-	###
+	###*
 	# Esconde a mensagem da tela
 	# @method hide
-	# @param {Object|Number} fadeOutObj caso preenchido, será passado como parametro para o método fadeOut do jQuery
+	# @param {Object|Number} fadeOutObj caso preenchido, será passado como parametro para o método 
+	#[fadeOut do jQuery](http://api.jquery.com/fadeOut/)
 	# @return 
 	###
 	hide: (fadeOutObj) =>
@@ -145,7 +147,7 @@ class Message
 		else
 			@domElement.hide()
 			@visible = false
-###
+###*
 # Classe Messages, que agrupa todas as mensagens
 # @class Messages
 # @constructor
@@ -164,12 +166,12 @@ class Messages
 
 		@bindAjaxError() if @ajaxError
 
-	###
-	# Adiciona uma mensagem ao objeto Messages, exibe caso passado show como true
+	###*
+	# Adiciona uma mensagem ao objeto Messages, exibe na tela imediatamente caso passado param show como true
 	# @method addMessage
 	# @param {Object} message
-	# @param {Boolean} show boolean 
-	# @returns {Object} retorna a instancia da Message criada
+	# @param {Boolean} show caso verdadeiro, após a criação da mensagem, ela será exibida 
+	# @return {Object} retorna a instancia da Message criada
 	###
 	addMessage: (message, show = false) =>
 		messageObj = new Message(message)
@@ -177,11 +179,11 @@ class Messages
 		messageObj.show(show) if show
 		return messageObj
 
-	###
+	###*
 	# Remove uma mensagem
 	# @method removeMessage
 	# @param {Object} messageProperty objeto Message ou objeto com alguma propriedade da mensagem a ser removida
-	# @returns
+	# @return
 	###
 	removeMessage: (messageProperty) =>
 		results = _.where(@messagesArray, messageProperty)
@@ -191,11 +193,10 @@ class Messages
 					@messagesArray.splice(i,1)
 					return
 
-	###
+	###*
 	# Bind erros de Ajax para exibir modal de erro
 	# @method bindAjaxError
-	# @param 
-	# @returns 
+	# @return
 	###
 	bindAjaxError: ->
 		$(document).ajaxError (event, xhr, ajaxOptions, thrownError) =>
@@ -211,8 +212,14 @@ class Messages
 				globalError = "Error"
 
 			if xhr.getResponseHeader('x-vtex-operation-id')
-				globalError += ' <small>(Operation ID ' + decodeURIComponent(xhr.getResponseHeader('x-vtex-operation-id')) + ')</small>'
-			errorMessage = if xhr.getResponseHeader('x-vtex-error-message') then JSON.parse(xhr.responseText).error.message else globalUnknownError
+				globalError += ' <small>(Operation ID ' 
+				globalError += decodeURIComponent(xhr.getResponseHeader('x-vtex-operation-id')) 
+				globalError += ')</small>'
+
+			if xhr.getResponseHeader('x-vtex-error-message')
+				errorMessage = JSON.parse(xhr.responseText).error.message 
+			else 
+				errorMessage = globalUnknownError
 
 			# Exibe mensagem na tela
 			messageObj =
@@ -230,10 +237,12 @@ class Messages
 
 			@addMessage(messageObj, true)
 
-	###
+	###*
 	# Get cookie
-	# @param {String} nome do cookie
-	# @returns {String|null} valor do cookie
+	# @private
+	# @method getCookie
+	# @param {String} name nome do cookie
+	# @return {String} valor do cookie
 	###
 	getCookie = (name) ->
 		cookieValue = null
