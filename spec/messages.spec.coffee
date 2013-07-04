@@ -192,6 +192,23 @@ describe 'Messages', ->
 			expect(message.visible).toBe(true)
 			expect($(message.domElement,message.placeholder)).toBeVisible()
 
+		it 'should call event functions when it is a modal message', ->
+			# Arrange
+			opts = { type: 'fatal' }
+			
+			shownFn = jasmine.createSpy('shownFn')
+			showOptions = { shown: shownFn }
+
+			$.support.transition = false
+
+			# Act
+			message = messages.addMessage(opts, showOptions)
+
+			# Assert		
+			expect(showOptions.shown).toHaveBeenCalled()
+			expect(showOptions.shown.mostRecentCall.args[0]).toEqual(message)
+			expect(message.visible).toBe(true)
+
 	describe 'AJAX', ->
 
 		#jasmine.Ajax.useMock()

@@ -5,14 +5,20 @@ $ ->
 		content: 
 			title: 'Erro 1!'
 			detail: 'Ocorreu um erro inesperado nos nossos servidores.'
-		type: 'fatal'		
-	window.message1 = messages.addMessage(message)
+		type: 'fatal'
+
+	modalOpts = 
+		'shown': (m) => 
+			console.log("Mostrei", $('.btn',m.domElement))
+			$('.btn',m.domElement).focus()
+	
+	window.message1 = messages.addMessage(message, modalOpts)
 
 	message = 
 		content: 
 			title: 'Erro 2'
 			detail: 'Ocorreu um erro inesperado nos nossos servidores.'
-		type: 'info'		
-	window.message2 = messages.addMessage(message)
+		type: 'fatal'
+	window.message2 = messages.addMessage(message, true)
 
-	$.ajax("http://staples.vtexlocal.com.br/Site/OutrasFormasPagamento.aspx?IdSku=2008124&PopupComum=true")
+	#$.ajax("http://staples.vtexlocal.com.br/Site/OutrasFormasPagamento.aspx?IdSku=2008124&PopupComum=true")

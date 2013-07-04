@@ -3,6 +3,7 @@ files = [
 	JASMINE_ADAPTER,
 	'build/lib/jquery-1.8.3.min.js',
 	'build/lib/underscore-min.js',
+	'build/lib/bootstrap/js/bootstrap.min.js',
 	'build/js/vtex-message.js',
 	'build/spec/helpers/jasmine-jquery.js',
 	{

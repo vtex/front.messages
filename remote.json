@@ -20,7 +20,7 @@
 		"/$",
 		"index.html"
 	],
-	"mapping": true,
+	"mapping": false,
 	"mappings": {
 		"mock":"spec/fixtures/messages-api.json"
 	}

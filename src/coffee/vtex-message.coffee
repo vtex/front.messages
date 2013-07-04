@@ -42,6 +42,9 @@ class Message
 			<div class="modal-body">
 				<p class="vtex-message-detail"></p>
 			</div>
+			<div class="modal-footer">
+				<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+			</div>
 		</div>
 		"""
 
@@ -93,31 +96,40 @@ class Message
 	###*
 	# Exibe a mensagem da tela
 	# @method show
-	# @param {Object|Number} fadeInObj caso preenchido, será passado como parametro para o método 
-	#[fadeIn do jQuery](http://api.jquery.com/fadeIn/)
+	# @param {Object|Number} options será passado como parametro para o método 
+	# [fadeIn do jQuery](http://api.jquery.com/fadeIn/). Caso seja Modal, será tratado os 
+	# [eventos de modal do Bootstrap](http://twitter.github.io/bootstrap/javascript.html#modals)
 	# @return 
 	###
-	show: (fadeInObj) =>
+	show: (options) =>
 		if @usingModal
-			visibleModal = $('.modal:visible')
-			if visibleModal.length > 0 and visibleModal[0] isnt @domElement[0]
-				visibleModal.one 'hidden', =>
-					$(@domElement).modal('show')
-					@visible = true
-			else
+			if typeof options is 'object'
+				for eventName in ['show', 'shown', 'hide', 'hidden'] when typeof options[eventName] is 'function'
+					do (eventName) => $(@domElement).on eventName, => options[eventName](@)
+
+			flagVisibleSet = false
+			for modal in $('.modal')
+				modalData = $(modal).data('vtex-message')
+				if modalData.visible is true and modalData.domElement isnt @domElement[0]
+					flagVisibleSet = true
+					$(modal).one 'hidden', =>
+						$(@domElement).modal('show')
+						@visible = true
+			
+			if not flagVisibleSet
+				$(@domElement).on 'shown', => @visible = true
 				$(@domElement).modal('show')
-				@visible = true
+
 			return
 
-		if typeof fadeInObj is 'object' or typeof fadeInObj is 'number'
-			if typeof fadeInObj is 'object' and fadeInObj.complete? and typeof fadeInObj.complete is 'function'
-				userDone = fadeInObj.complete
-				fadeInObj.complete = =>
-					@visible = true
-					userDone()
-				@domElement.fadeIn(fadeInObj)
-			else if typeof fadeInObj is 'number'
-				@domElement.fadeIn(fadeInObj, => @visible = true)
+		if typeof options is 'object' and options.complete? and typeof options.complete is 'function'
+			userDone = options.complete
+			options.complete = =>
+				@visible = true
+				userDone()
+			@domElement.fadeIn(options)
+		else if typeof options is 'number'
+			@domElement.fadeIn(options, => @visible = true)
 		else
 			@domElement.show()
 			@visible = true
@@ -125,25 +137,24 @@ class Message
 	###*
 	# Esconde a mensagem da tela
 	# @method hide
-	# @param {Object|Number} fadeOutObj caso preenchido, será passado como parametro para o método 
+	# @param {Object|Number} options caso preenchido, será passado como parametro para o método 
 	#[fadeOut do jQuery](http://api.jquery.com/fadeOut/)
 	# @return 
 	###
-	hide: (fadeOutObj) =>
+	hide: (options) =>
 		if @usingModal
 			@domElement.modal('hide')
 			@visible = false
 			return
 
-		if fadeOutObj
-			if typeof fadeOutObj is 'object' and fadeOutObj.complete? and typeof fadeOutObj.complete is 'function'
-				userDone = fadeOutObj.complete
-				fadeOutObj.complete = =>
-					@visible = false
-					userDone()
-				@domElement.fadeOut(fadeOutObj)
-			else if typeof fadeOutObj is 'number'
-				@domElement.fadeOut(fadeOutObj, => @visible = false)
+		if typeof options is 'object' and options.complete? and typeof options.complete is 'function'
+			userDone = options.complete
+			options.complete = =>
+				@visible = false
+				userDone()
+			@domElement.fadeOut(options)
+		else if typeof options is 'number'
+			@domElement.fadeOut(options, => @visible = false)
 		else
 			@domElement.hide()
 			@visible = false
@@ -176,7 +187,7 @@ class Messages
 	addMessage: (message, show = false) =>
 		messageObj = new Message(message)
 		@messagesArray.push messageObj
-		messageObj.show(show) if show
+		messageObj.show(show) if show isnt false
 		return messageObj
 
 	###*
