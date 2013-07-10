@@ -6,8 +6,9 @@ files = [
 	'build/lib/bootstrap/js/bootstrap.min.js',
 	'build/js/vtex-message.js',
 	'build/spec/helpers/jasmine-jquery.js',
+	'build/spec/helpers/mock-ajax.js',
 	{
-		pattern: 'build/spec/fixtures/**/*.html',
+		pattern: 'build/spec/fixtures/**/*.*',
 		watched: true,
 		included: false,
 		served: true

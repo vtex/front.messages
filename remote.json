@@ -1,11 +1,11 @@
 {
 	"remote": {
-		"host": "dontpad.com",
+		"host": "staples.vtexcommercebeta.com.br",
 		"port": 80
 	},
 	"proxy": {
-		"host": "localhost",
-		"port": 3000
+		"host": "staples.vtexlocal.com.br",
+		"port": 80
 	},
 	"server": {
 		"host": "localhost",
@@ -21,7 +21,6 @@
 		"index.html"
 	],
 	"mapping": false,
-	"mappings": {
-		"mock":"spec/fixtures/messages-api.json"
+	"mappings": {		
 	}
 }
