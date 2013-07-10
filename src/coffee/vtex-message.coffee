@@ -78,6 +78,7 @@ class Message
 				if not $(@template)[0] then throw new Error("Couldn't find specified template for Message")
 
 			@domElement = $(@template).clone(false, false)
+			$(@domElement).bind 'closed', => @visible = false
 
 		$(@domElement).removeClass(@classes.TEMPLATE)
 		$(@domElement).addClass(@prefixClassForType+@type+" "+@id+" "+@classes.MESSAGEINSTANCE)
