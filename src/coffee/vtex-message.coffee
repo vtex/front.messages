@@ -121,7 +121,7 @@ class Message
 						@visible = true
 			
 			if not flagVisibleSet
-				$(@domElement).on 'shown', => @visible = true
+				$(@domElement).on 'show', => @visible = true
 				$(@domElement).modal('show')
 
 			return
