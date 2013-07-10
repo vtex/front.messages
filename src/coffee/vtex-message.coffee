@@ -8,7 +8,7 @@ window.vtex or = {}
 ###
 class Message
 	constructor: (options = {}) ->
-		classes =			
+		@classes =			
 			TEMPLATEDEFAULT: '.vtex-message-template.vtex-message-template-default'
 			MODALTEMPLATEDEFAULT: '.vtex-message-template.vtex-message-template-modal-default'
 			PLACEHOLDER: '.vtex-message-placeholder'
@@ -16,14 +16,16 @@ class Message
 			TEMPLATE: 'vtex-message-template'
 			TITLE: '.vtex-message-title'
 			DETAIL: '.vtex-message-detail'
-			TYPE: 'vtex-message-type-'
+			TYPE: 'alert-'
+			MESSAGEINSTANCE: 'vtex-message-instance'
 
 		defaultProperties =
 			id: _.uniqueId('vtex-message-')
-			placeholder: classes.PLACEHOLDER
-			modalPlaceholder: classes.MODALPLACEHOLDER
-			template: classes.TEMPLATE
-			modalTemplate: classes.MODALTEMPLATE
+			placeholder: @classes.PLACEHOLDER
+			modalPlaceholder: @classes.MODALPLACEHOLDER
+			template: @classes.TEMPLATE
+			modalTemplate: @classes.MODALTEMPLATE
+			prefixClassForType: @classes.TYPE
 			content:
 				title: ''
 				detail: ''
@@ -49,9 +51,10 @@ class Message
 		"""
 
 		defaultTemplate = """
-		<div class="vtex-message-template vtex-message-template-default">
-			<h1 class="vtex-message-title"></h1>
-			<p class="vtex-message-detail"></p>
+		<div class="vtex-message-template vtex-message-template-default static-message-template alert">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<h4 class="alert-heading vtex-message-title"></h4>
+			<p class="message-text vtex-message-detail"></p>
 		</div>
 		"""
 
@@ -60,7 +63,7 @@ class Message
 		if @usingModal
 			if not $(@modalPlaceholder)[0] then throw new Error("Couldn't find placeholder for modal Message")
 			
-			if @modalTemplate is classes.MODALTEMPLATE
+			if @modalTemplate is @classes.MODALTEMPLATE
 				@modalTemplate = modalDefaultTemplate
 			else
 				if not $(@modalTemplate)[0] then throw new Error("Couldn't find specified template for modal Message")
@@ -69,19 +72,19 @@ class Message
 		else
 			if not $(@placeholder)[0] then throw new Error("Couldn't find placeholder for Message")
 
-			if @template is classes.TEMPLATE
+			if @template is @classes.TEMPLATE
 				@template = defaultTemplate
 			else
 				if not $(@template)[0] then throw new Error("Couldn't find specified template for Message")
 
 			@domElement = $(@template).clone(false, false)
 
-		$(@domElement).removeClass(classes.TEMPLATE)
-		$(@domElement).addClass(classes.TYPE+@type+" "+@id)
+		$(@domElement).removeClass(@classes.TEMPLATE)
+		$(@domElement).addClass(@prefixClassForType+@type+" "+@id+" "+@classes.MESSAGEINSTANCE)
 		$(@domElement).hide()
 		$(@domElement).data('vtex-message', @)
-		$(classes.TITLE, @domElement).html(@content.title)
-		$(classes.DETAIL, @domElement).html(@content.detail)
+		$(@classes.TITLE, @domElement).html(@content.title)
+		$(@classes.DETAIL, @domElement).html(@content.detail)
 
 		if @usingModal
 			$(@domElement).on 'hidden', => @visible = false
@@ -108,7 +111,7 @@ class Message
 					do (eventName) => $(@domElement).on eventName, => options[eventName](@)
 
 			flagVisibleSet = false
-			for modal in $('.modal')
+			for modal in $('.modal.'+@classes.MESSAGEINSTANCE)
 				modalData = $(modal).data('vtex-message')
 				if modalData.visible is true and modalData.domElement isnt @domElement[0]
 					flagVisibleSet = true
@@ -228,7 +231,7 @@ class Messages
 				globalError += ')</small>'
 
 			if xhr.getResponseHeader('x-vtex-error-message')
-				errorMessage = JSON.parse(xhr.responseText).error.message 
+				errorMessage = xhr.responseText
 			else 
 				errorMessage = globalUnknownError
 
