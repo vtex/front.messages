@@ -130,7 +130,7 @@ class Message
 			userDone = options.complete
 			options.complete = =>
 				@visible = true
-				userDone()
+				userDone(@)
 			@domElement.fadeIn(options)
 		else if typeof options is 'number'
 			@domElement.fadeIn(options, => @visible = true)
@@ -155,7 +155,7 @@ class Message
 			userDone = options.complete
 			options.complete = =>
 				@visible = false
-				userDone()
+				userDone(@)
 			@domElement.fadeOut(options)
 		else if typeof options is 'number'
 			@domElement.fadeOut(options, => @visible = false)
