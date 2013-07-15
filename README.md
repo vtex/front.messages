@@ -78,7 +78,7 @@ Você poderá vê-lo em ação em `http://localhost:9001/`.
 			<td>visible</td>
 			<td>boolean</td>
 			<td><code>true</code></td>
-			<td>Caso seja true a mensagem é exibida após a criação. Pode ser passado como param um objeto do tipo [fadeIn do jQUery](http://api.jquery.com/fadeIn/)</td>
+			<td>Caso seja true a mensagem é exibida após a criação. Pode ser passado como param um objeto do tipo <a href="http://api.jquery.com/fadeIn/">fadeIn do jQUery</a></td>
 		</tr>
 	</tbody>
 </table>
@@ -139,7 +139,7 @@ Você poderá vê-lo em ação em `http://localhost:9001/`.
 			<td>showOptions</td>
 			<td>object</td>
 			<td>{duration:500, complete: function(message){console.log(message);}}</td>
-			<td>Pode ser passado como parâmetro um objeto do tipo [fadeIn do jQuery](http://api.jquery.com/fadeIn/). Caso seja um Modal, pode ser passado como parâmetro um objeto com callbacks de [eventos de Modal do Bootstrap](http://twitter.github.io/bootstrap/javascript.html#modals). Em ambos os casos, todas as funções de callback receberão como parametro a instância da message.</td>
+			<td>Pode ser passado como parâmetro um objeto do tipo <a href="http://api.jquery.com/fadeIn/">fadeIn do jQuery</a>. Caso seja um Modal, pode ser passado como parâmetro um objeto com callbacks de  <a href="http://twitter.github.io/bootstrap/javascript.html#modals">eventos de Modal do Bootstrap</a>. Em ambos os casos, todas as funções de callback receberão como parametro a instância da message.</td>
 		</tr>
 	</tbody>
 </table>
@@ -160,7 +160,7 @@ Você poderá vê-lo em ação em `http://localhost:9001/`.
 			<td>hideOptions</td>
 			<td>object</td>
 			<td>{duration:500, complete: function(message){console.log(message);}}</td>
-			<td>Pode ser passado como parâmetro um objeto do tipo [fadeOut do jQuery](http://api.jquery.com/fadeOut/). Caso seja um Modal, pode ser passado como parâmetro um objeto com callbacks de [eventos de Modal do Bootstrap](http://twitter.github.io/bootstrap/javascript.html#modals). Em ambos os casos, todas as funções de callback receberão como parametro a instância da message.</td>
+			<td>Pode ser passado como parâmetro um objeto do tipo <a href="http://api.jquery.com/fadeOut/">fadeOut do jQuery</a>. Caso seja um Modal, pode ser passado como parâmetro um objeto com callbacks de <a href="http://twitter.github.io/bootstrap/javascript.html#modals">eventos de Modal do Bootstrap</a>. Em ambos os casos, todas as funções de callback receberão como parametro a instância da message.</td>
 		</tr>
 	</tbody>
 </table>
