@@ -205,10 +205,40 @@ describe "Messages", ->
 			# Act
 			message = messages.addMessage(opts, showOptions)
 
-			# Assert		
+			# Assert
 			expect(showOptions.shown).toHaveBeenCalled()
-			expect(showOptions.shown.mostRecentCall.args[0]).toEqual(message)			
+			expect(showOptions.shown.mostRecentCall.args[0]).toEqual(message)
 			expect(message.visible).toBe(true)
+
+		it 'should hide the title if it is and empty string', ->
+			# Arrange
+			opts =
+				content:
+					title: ''
+					detail: 'foo'
+
+			# Act
+			message = messages.addMessage(opts, true)
+			
+			# Assert
+			expect($(message.classes.TITLE, message.domElement)).not.toBeVisible()
+			expect($(message.classes.DETAIL, message.domElement)).toBeVisible()
+
+		it 'should show the message contents inside the elements specified', ->
+			# Arrange
+			opts =
+				content:
+					title: 'foo'
+					detail: 'bar'
+
+			# Act
+			message = messages.addMessage(opts, true)
+			
+			# Assert
+			expect($(message.classes.TITLE, message.domElement)).toBeVisible()
+			expect($(message.classes.DETAIL, message.domElement)).toBeVisible()
+			expect($(message.classes.TITLE, message.domElement).html()).toMatch('foo')
+			expect($(message.classes.DETAIL, message.domElement).html()).toMatch('bar')
 
 	describe "AJAX", ->
 
@@ -222,7 +252,7 @@ describe "Messages", ->
 			jasmine.Ajax.useMock()
 			ajaxResponses = {
 				"success": {
-					"status": 200,					
+					"status": 200,
 					"responseText": '{
 						"messages": [
 							{
