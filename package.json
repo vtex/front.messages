@@ -1,8 +1,8 @@
 {
-	"name": "speedbag",
-	"version": "0.2.0",
+	"name": "front-messages-ui",
+	"version": "1.1.0",
 	"readmeFilename": "README.md",
-	"description": "A grunt coffee/less/live-reload/cssmin/uglify/connect/bootstrap/zepto/lodash boilerplate.",
+	"description": "jQuery and Bootstrap based messages plugin.",
 	"main": "index.html",
 	"dependencies": {
 		"grunt": "~0.4.1",
@@ -20,11 +20,12 @@
 		"grunt-usemin": "~0.1.10",
 		"coffee-script": "~1.6.2",
 		"remote": "~0.2.5",
-    "grunt-karma": "~0.4.4"
+		"bower": "~0.10.0",
+    	"grunt-karma": "~0.4.4"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git://github.com/vtex/speedbag.git"
+		"url": "git://github.com/vtex/front.messages.git"
 	},
 	"keywords": [
 		"grunt",
@@ -32,6 +33,6 @@
 		"less",
 		"livereload"
 	],
-	"author": "Guilherme Rodrigues <gadr90@gmail.com>",
+	"author": "Breno Calazans <breno@vtex.com.br>",
 	"license": "MIT"
 }
