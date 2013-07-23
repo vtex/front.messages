@@ -231,8 +231,10 @@ class Messages
 				globalError = "Error"
 
 			if xhr.getResponseHeader('x-vtex-operation-id')
-				globalError += ' <small>(Operation ID ' 
+				globalError += ' <small class="vtex-operation-id-container">(Operation ID '
+				globalError += '<span class="vtex-operation-id">' 
 				globalError += decodeURIComponent(xhr.getResponseHeader('x-vtex-operation-id')) 
+				globalError += '</span>'
 				globalError += ')</small>'
 
 			if xhr.getResponseHeader('x-vtex-error-message')
