@@ -3,16 +3,21 @@ fs = require('fs')
 
 module.exports = (grunt) ->
 	pacha = grunt.file.readJSON('tools/pachamama/pachamama.config')[0]
+	whoami = grunt.file.readJSON('meta/whoami')
+	# Tags
+	tagApplicationRoot = "&lt;%=@" + pacha.acronym + "_root%&gt;"
+	
 	# Project configuration.
 	grunt.initConfig
-		resourceToken: process.env['RESOURCE_TOKEN'] or '/io'
-		gitCommit: process.env['GIT_COMMIT'] or 'GIT_COMMIT'
-		deployDirectory: path.normalize(process.env['DEPLOY_DIRECTORY'] ? 'deploy')
+		# App variables
 		relativePath: ''
-		pkg: grunt.file.readJSON('package.json')
-		pacha: pacha
+		applicationRoot: process.env['APPLICATION_ROOT'] or whoami.roots[0]
+		deployDirectory: path.normalize(process.env['DEPLOY_DIRECTORY'] ? 'deploy')
+		gitCommit: process.env['GIT_COMMIT'] or 'GIT_COMMIT'
+
+		# Version variables
 		acronym: pacha.acronym
-		environmentName: process.env['ENVIRONMENT_NAME'] or '1-0-0'
+		environmentName: process.env['ENVIRONMENT_NAME'] or '01-00-00'
 		buildNumber: process.env['BUILD_NUMBER'] or '1'
 		environmentType: process.env['ENVIRONMENT_TYPE'] or 'stable'
 		versionName: -> [grunt.config('acronym'), grunt.config('environmentName'), grunt.config('buildNumber'),
@@ -22,8 +27,24 @@ module.exports = (grunt) ->
 			main:
 				expand: true
 				cwd: 'src/'
-				src: ['**', '!includes/**', '!coffee/**', '!**/*.less']
+				src: ['**', '!coffee/**', '!**/*.less']
 				dest: 'build/<%= relativePath %>'
+
+			debug:
+				src: ['src/index.html']
+				dest: 'build/<%= relativePath %>/index.debug.html'
+
+			commit:
+				expand: true
+				cwd: 'build/<%= relativePath %>/'
+				src: ['**', '!coffee/**', '!**/*.less']
+				dest: '<%= deployDirectory %>/<%= gitCommit %>/'
+
+			version:
+				expand: true
+				cwd: '<%= deployDirectory %>/<%= gitCommit %>/'
+				src: ['**']
+				dest: '<%= deployDirectory %>/<%= versionName() %>/'
 
 			test: 
 				expand: true
@@ -31,21 +52,14 @@ module.exports = (grunt) ->
 				src: ['**', '!**/*.coffee']
 				dest: 'build/<%= relativePath %>/spec/'
 
-			debug:
-				src: ['src/index.html']
-				dest: 'build/<%= relativePath %>/index.debug.html'
-
-			deploy:
+			dist:
 				expand: true
+				flatten: true
 				cwd: 'build/<%= relativePath %>/'
-				src: ['**', '!includes/**', '!coffee/**', '!**/*.less']
-				dest: '<%= deployDirectory %>/<%= gitCommit %>/'
-
-			env:
-				expand: true
-				cwd: '<%= deployDirectory %>/<%= gitCommit %>/'
-				src: ['**']
-				dest: '<%= deployDirectory %>/<%= versionName() %>/'
+				src: [
+					'js/vtex-message.js', 'js/vtex-message.min.js'
+				]
+				dest: 'dist/'
 
 		coffee:
 			main:
@@ -73,6 +87,11 @@ module.exports = (grunt) ->
 		usemin:
 			html: 'build/<%= relativePath %>/index.html'
 
+		uglify:
+			dist:
+				files:
+					'build/js/vtex-message.min.js': ['build/js/vtex-message.js']
+
 		karma:
 			options:
 				configFile: 'karma.conf.js'
@@ -82,21 +101,34 @@ module.exports = (grunt) ->
 				singleRun: true
 
 		'string-replace':
-			deploy:
+			# This replacement treats src and href attributes which cannot contain variables in order for
+			# the minification process to work. It adds the applicationRoot tag variables before the files address.
+			commit:
+				files:
+					'<%= deployDirectory %>/<%= gitCommit %>/index.html': ['<%= deployDirectory %>/<%= gitCommit %>/index.html']
+					'<%= deployDirectory %>/<%= gitCommit %>/index.debug.html': ['<%= deployDirectory %>/<%= gitCommit %>/index.debug.html']
+
+				options:
+					replacements: [
+						pattern: /src="(\.\.\/)?(?!http|\/|\/\/|\#|\&|\'\&)/ig
+						replacement: 'src="' + tagApplicationRoot
+					,
+						pattern: /href="(\.\.\/)?(?!http|\/|\/\/|\#|\&|\'\&)/ig
+						replacement: 'href="' + tagApplicationRoot
+					,
+						pattern: '<script src="http://localhost:35729/livereload.js"></script>'
+						replacement: ''
+					]
+			# Here, all tag variables are replaced for production-ready endpoints.
+			version:
 				files:
 					'<%= deployDirectory %>/<%= versionName() %>/index.html': ['<%= deployDirectory %>/<%= versionName() %>/index.html']
 					'<%= deployDirectory %>/<%= versionName() %>/index.debug.html': ['<%= deployDirectory %>/<%= versionName() %>/index.debug.html']
 
 				options:
 					replacements: [
-						pattern: /src="(\.\.\/)?(?!http|\/|\/\/|\#)/ig
-						replacement: 'src="/io/messages/'
-					,
-						pattern: /href="(\.\.\/)?(?!http|\/|\/\/|\#)/ig
-						replacement: 'href="/io/messages/'
-					,
-						pattern: '<script src="http://localhost:35729/livereload.js"></script>'
-						replacement: ''
+						pattern: new RegExp(tagApplicationRoot, "gi")
+						replacement: '<%= applicationRoot %>/'
 					]
 
 		connect:
@@ -150,24 +182,30 @@ module.exports = (grunt) ->
 
 	# TDD
 	grunt.registerTask 'tdd', ['dev', 'connect', 'remote', 'karma:unit', 'watch:test']
-	
+
+	# Dist
+	grunt.registerTask 'dist', ['prod', 'copy:dist']
+
+	# Tasks for deploy build
+	grunt.registerTask 'gen-commit', ['clean', 'copy:main', 'copy:test', 'coffee', 'less', 'copy:debug',
+										'useminPrepare', 'concat', 'uglify', 'cssmin', 'usemin', 
+										'copy:commit', 'string-replace:commit']
+
 	# Generates version folder
 	grunt.registerTask 'gen-version', ->
-		grunt.log.writeln 'Deploying to environmentName: '.cyan + grunt.config('environmentName').green
-		grunt.log.writeln 'Deploying to buildNumber: '.cyan + grunt.config('buildNumber').green
-		grunt.log.writeln 'Deploying to environmentType: '.cyan + grunt.config('environmentType').green
-		grunt.log.writeln 'Directory: '.cyan + grunt.config('versionName')().green
-		grunt.log.writeln 'Version set to: '.cyan + grunt.config('gitCommit').green
-		grunt.log.writeln 'Rersource token set to: '.cyan + grunt.config('resourceToken').green
-		grunt.log.writeln 'Deploy folder: '.cyan + grunt.config('deployDirectory').green
-		grunt.task.run ['copy:env', 'string-replace:deploy']
+		grunt.log.writeln 'applicationRoot: '.cyan + grunt.config('applicationRoot').green
+		grunt.log.writeln 'environmentName: '.cyan + grunt.config('environmentName').green
+		grunt.log.writeln 'buildNumber: '.cyan + grunt.config('buildNumber').green
+		grunt.log.writeln 'environmentType: '.cyan + grunt.config('environmentType').green
+		grunt.log.writeln 'Version deploy directory: '.cyan + (path.resolve grunt.config('deployDirectory'), grunt.config('versionName')()).green
+		grunt.task.run ['copy:version', 'string-replace:version']
 
 	# Deploy - creates deploy folder structure
 	grunt.registerTask 'deploy', ->
 		commit = grunt.config('gitCommit')
 		deployDir = path.resolve grunt.config('deployDirectory'), commit
 		deployExists = false
-		grunt.log.writeln 'Version deploy dir set to: '.cyan + deployDir.green
+		grunt.log.writeln 'Commit deploy directory: '.cyan + deployDir.green
 		try
 			deployExists = fs.existsSync deployDir
 		catch e
@@ -176,10 +214,10 @@ module.exports = (grunt) ->
 
 		if deployExists
 			grunt.log.writeln 'Folder '.cyan + deployDir.green + ' already exists.'.cyan
-			grunt.log.writeln 'Skipping build process and generating environmentType folder.'.cyan
-			grunt.task.run ['clean', 'gen-version']
+			grunt.log.writeln 'Skipping build process and generating version folder.'.cyan
+			grunt.task.run ['gen-version']
 		else
-			grunt.task.run ['prod', 'karma:deploy', 'copy:deploy', 'gen-version']
+			grunt.task.run ['gen-commit', 'karma:deploy', 'gen-version']
 
 	#	Remote task
 	grunt.registerTask 'remote', 'Run Remote proxy server', ->
