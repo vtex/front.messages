@@ -88,7 +88,7 @@
       $(this.domElement).addClass(this.prefixClassForType + this.type + " " + this.id + " " + this.classes.MESSAGEINSTANCE);
       $(this.domElement).hide();
       $(this.domElement).data('vtex-message', this);
-      if (this.content.title !== '') {
+      if (this.content.title && this.content.title !== '') {
         $(this.classes.TITLE, this.domElement).html(this.content.title);
       } else {
         $(this.classes.TITLE, this.domElement).hide();

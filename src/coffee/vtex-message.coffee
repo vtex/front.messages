@@ -84,7 +84,7 @@ class Message
 		$(@domElement).addClass(@prefixClassForType+@type+" "+@id+" "+@classes.MESSAGEINSTANCE)
 		$(@domElement).hide()
 		$(@domElement).data('vtex-message', @)
-		if @content.title isnt '' 
+		if @content.title and @content.title isnt ''
 			$(@classes.TITLE, @domElement).html(@content.title)
 		else
 			$(@classes.TITLE, @domElement).hide()
