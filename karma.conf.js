@@ -1,9 +1,9 @@
 files = [
 	JASMINE,
 	JASMINE_ADAPTER,
-	'build/lib/bower_modules/jquery.js',
-	'build/lib/bower_modules/underscore.js',
-	'build/lib/bower_modules/bootstrap.js',
+	'build/lib/bower_components/jquery/jquery.js',
+	'build/lib/bower_components/underscore/underscore.js',
+	'build/lib/bower_components/bootstrap/bootstrap.js',
 	'build/js/vtex-message.js',
 	'build/spec/helpers/jasmine-jquery.js',
 	'build/spec/helpers/mock-ajax.js',
