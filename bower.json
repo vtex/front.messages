@@ -10,8 +10,9 @@
 		"bootstrap": "2.3.2"
 	},
 	"devDependencies": {
+		"jquery-mockjax": "appendto/jquery-mockjax#1.5.2"
 	},
 	"install": {
-		"path": "src/lib/bower_modules"
+		"path": "src/lib/bower_components"
 	}
 }
