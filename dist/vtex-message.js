@@ -325,9 +325,9 @@
         if (xhr.getResponseHeader('x-vtex-error-message')) {
           isContentJson = ((_ref = xhr.getResponseHeader('Content-Type')) != null ? _ref.indexOf('application/json') : void 0) !== -1;
           if (isContentJson && (((_ref1 = xhr.responseText.error) != null ? _ref1.message : void 0) != null)) {
-            errorMessage = xhr.responseText.error.message;
+            errorMessage = decodeURI(xhr.responseText.error.message);
           } else {
-            errorMessage = xhr.getResponseHeader('x-vtex-error-message');
+            errorMessage = decodeURI(xhr.getResponseHeader('x-vtex-error-message'));
             if (getCookie("ShowFullError") === "Value=1") {
               errorMessage += '<div class="vtex-error-detail-container">\n	<a href="javascript:void(0);" class="vtex-error-detail-link" onClick="$(\'.vtex-error-detail\').show()">\n		<small>Details</small>\n	</a>\n	<div class="vtex-error-detail" style="display: none;"></div>\n</div>';
               iframe = document.createElement('iframe');

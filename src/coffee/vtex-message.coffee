@@ -240,9 +240,9 @@ class Messages
 			if xhr.getResponseHeader('x-vtex-error-message')
 				isContentJson = xhr.getResponseHeader('Content-Type')?.indexOf('application/json') isnt -1
 				if isContentJson and xhr.responseText.error?.message?
-					errorMessage = xhr.responseText.error.message
+					errorMessage = decodeURI(xhr.responseText.error.message)
 				else
-					errorMessage = xhr.getResponseHeader('x-vtex-error-message')
+					errorMessage = decodeURI(xhr.getResponseHeader('x-vtex-error-message'))
 					if getCookie("ShowFullError") is "Value=1"
 						errorMessage += '''
 							<div class="vtex-error-detail-container">
