@@ -230,7 +230,9 @@ class Messages
 				globalUnknownError = "An unexpected error ocurred."
 				globalError = "Error"
 
-			if xhr.getResponseHeader('x-vtex-operation-id')
+			showFullError = getCookie("ShowFullError") is "Value=1"
+
+			if xhr.getResponseHeader('x-vtex-operation-id') and showFullError
 				globalError += ' <small class="vtex-operation-id-container">(Operation ID '
 				globalError += '<span class="vtex-operation-id">' 
 				globalError += decodeURIComponent(xhr.getResponseHeader('x-vtex-operation-id')) 
@@ -240,10 +242,10 @@ class Messages
 			if xhr.getResponseHeader('x-vtex-error-message')
 				isContentJson = xhr.getResponseHeader('Content-Type')?.indexOf('application/json') isnt -1
 				if isContentJson and xhr.responseText.error?.message?
-					errorMessage = decodeURI(xhr.responseText.error.message)
+					errorMessage = decodeURIComponent(xhr.responseText.error.message)
 				else
-					errorMessage = decodeURI(xhr.getResponseHeader('x-vtex-error-message'))
-					if getCookie("ShowFullError") is "Value=1"
+					errorMessage = decodeURIComponent(xhr.getResponseHeader('x-vtex-error-message'))
+					if showFullError
 						errorMessage += '''
 							<div class="vtex-error-detail-container">
 								<a href="javascript:void(0);" class="vtex-error-detail-link" onClick="$('.vtex-error-detail').show()">
@@ -253,7 +255,7 @@ class Messages
 							</div>
 						'''
 						iframe = document.createElement('iframe')
-						iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(xhr.responseText)
+						iframe.src = 'data:text/html;charset=utf-8,' + decodeURIComponent(xhr.responseText)
 						$(iframe).css('width', '100%')
 						$(iframe).css('height', '900px')
 						addIframeLater = true

@@ -299,7 +299,6 @@ describe "Messages", ->
 			expect(messages.messagesArray.length).toBe(1)
 			message = messages.messagesArray[0]
 			expect(message.usingModal).toBe(true)
-			expect(message.content.title).toMatch("123")
 
 		it "should not show a modal Message when a non-error AJAX occurs", ->
 			# Arrange
@@ -325,5 +324,4 @@ describe "Messages", ->
 			expect(messages.messagesArray.length).toBe(1)
 			message = messages.messagesArray[0]
 			expect(message.usingModal).toBe(true)
-			expect(message.content.title).toMatch("123")
 			expect(message.content.detail).toMatch("solr")

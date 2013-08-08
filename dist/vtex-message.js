@@ -301,7 +301,7 @@
     Messages.prototype.bindAjaxError = function() {
       var _this = this;
       return $(document).ajaxError(function(event, xhr, ajaxOptions, thrownError) {
-        var addIframeLater, errorMessage, globalError, globalUnknownError, iframe, isContentJson, messageObj, _ref, _ref1;
+        var addIframeLater, errorMessage, globalError, globalUnknownError, iframe, isContentJson, messageObj, showFullError, _ref, _ref1;
         if (xhr.status === 401 || xhr.status === 403) {
           return;
         }
@@ -315,7 +315,8 @@
           globalUnknownError = "An unexpected error ocurred.";
           globalError = "Error";
         }
-        if (xhr.getResponseHeader('x-vtex-operation-id')) {
+        showFullError = getCookie("ShowFullError") === "Value=1";
+        if (xhr.getResponseHeader('x-vtex-operation-id') && showFullError) {
           globalError += ' <small class="vtex-operation-id-container">(Operation ID ';
           globalError += '<span class="vtex-operation-id">';
           globalError += decodeURIComponent(xhr.getResponseHeader('x-vtex-operation-id'));
@@ -325,13 +326,13 @@
         if (xhr.getResponseHeader('x-vtex-error-message')) {
           isContentJson = ((_ref = xhr.getResponseHeader('Content-Type')) != null ? _ref.indexOf('application/json') : void 0) !== -1;
           if (isContentJson && (((_ref1 = xhr.responseText.error) != null ? _ref1.message : void 0) != null)) {
-            errorMessage = decodeURI(xhr.responseText.error.message);
+            errorMessage = decodeURIComponent(xhr.responseText.error.message);
           } else {
-            errorMessage = decodeURI(xhr.getResponseHeader('x-vtex-error-message'));
-            if (getCookie("ShowFullError") === "Value=1") {
+            errorMessage = decodeURIComponent(xhr.getResponseHeader('x-vtex-error-message'));
+            if (showFullError) {
               errorMessage += '<div class="vtex-error-detail-container">\n	<a href="javascript:void(0);" class="vtex-error-detail-link" onClick="$(\'.vtex-error-detail\').show()">\n		<small>Details</small>\n	</a>\n	<div class="vtex-error-detail" style="display: none;"></div>\n</div>';
               iframe = document.createElement('iframe');
-              iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(xhr.responseText);
+              iframe.src = 'data:text/html;charset=utf-8,' + decodeURIComponent(xhr.responseText);
               $(iframe).css('width', '100%');
               $(iframe).css('height', '900px');
               addIframeLater = true;
