@@ -301,7 +301,7 @@
     Messages.prototype.bindAjaxError = function() {
       var _this = this;
       return $(document).ajaxError(function(event, xhr, ajaxOptions, thrownError) {
-        var errorMessage, globalError, globalUnknownError, iframe, messageObj;
+        var addIframeLater, errorMessage, globalError, globalUnknownError, iframe, isContentJson, messageObj, _ref, _ref1;
         if (xhr.status === 401 || xhr.status === 403) {
           return;
         }
@@ -323,7 +323,20 @@
           globalError += ')</small>';
         }
         if (xhr.getResponseHeader('x-vtex-error-message')) {
-          errorMessage = xhr.responseText;
+          isContentJson = ((_ref = xhr.getResponseHeader('Content-Type')) != null ? _ref.indexOf('application/json') : void 0) !== -1;
+          if (isContentJson && (((_ref1 = xhr.responseText.error) != null ? _ref1.message : void 0) != null)) {
+            errorMessage = xhr.responseText.error.message;
+          } else {
+            errorMessage = xhr.getResponseHeader('x-vtex-error-message');
+            if (getCookie("ShowFullError") === "Value=1") {
+              errorMessage += '<div class="vtex-error-detail-container">\n	<a href="javascript:void(0);" class="vtex-error-detail-link" onClick="$(\'.vtex-error-detail\').show()">\n		<small>Details</small>\n	</a>\n	<div class="vtex-error-detail" style="display: none;"></div>\n</div>';
+              iframe = document.createElement('iframe');
+              iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(xhr.responseText);
+              $(iframe).css('width', '100%');
+              $(iframe).css('height', '900px');
+              addIframeLater = true;
+            }
+          }
         } else {
           errorMessage = globalUnknownError;
         }
@@ -334,14 +347,11 @@
             detail: errorMessage
           }
         };
-        if (getCookie("ShowFullError") === "Value=1") {
-          iframe = document.createElement('iframe');
-          iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(xhr.responseText);
-          $(iframe).css('width', '100%');
-          $(iframe).css('height', '900px');
-          messageObj.content.detail = iframe;
+        _this.addMessage(messageObj, true);
+        if (addIframeLater) {
+          $('.vtex-error-detail').html(iframe);
+          return addIframeLater = null;
         }
-        return _this.addMessage(messageObj, true);
       });
     };
 

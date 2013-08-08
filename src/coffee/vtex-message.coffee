@@ -238,7 +238,25 @@ class Messages
 				globalError += ')</small>'
 
 			if xhr.getResponseHeader('x-vtex-error-message')
-				errorMessage = xhr.responseText
+				isContentJson = xhr.getResponseHeader('Content-Type')?.indexOf('application/json') isnt -1
+				if isContentJson and xhr.responseText.error?.message?
+					errorMessage = xhr.responseText.error.message
+				else
+					errorMessage = xhr.getResponseHeader('x-vtex-error-message')
+					if getCookie("ShowFullError") is "Value=1"
+						errorMessage += '''
+							<div class="vtex-error-detail-container">
+								<a href="javascript:void(0);" class="vtex-error-detail-link" onClick="$('.vtex-error-detail').show()">
+									<small>Details</small>
+								</a>
+								<div class="vtex-error-detail" style="display: none;"></div>
+							</div>
+						'''
+						iframe = document.createElement('iframe')
+						iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(xhr.responseText)
+						$(iframe).css('width', '100%')
+						$(iframe).css('height', '900px')
+						addIframeLater = true
 			else 
 				errorMessage = globalUnknownError
 
@@ -249,14 +267,11 @@ class Messages
 					title: globalError	
 					detail: errorMessage
 
-			if getCookie("ShowFullError") is "Value=1"
-				iframe = document.createElement('iframe')
-				iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(xhr.responseText)
-				$(iframe).css('width', '100%')
-				$(iframe).css('height', '900px')
-				messageObj.content.detail = iframe
-
 			@addMessage(messageObj, true)
+
+			if addIframeLater
+				$('.vtex-error-detail').html(iframe)
+				addIframeLater = null
 
 	###*
 	# Get cookie

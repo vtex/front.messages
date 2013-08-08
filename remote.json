@@ -1,10 +1,10 @@
 {
 	"remote": {
-		"host": "staples.vtexcommercebeta.com.br",
+		"host": "walmartv5.vtexcommercebeta.com.br",
 		"port": 80
 	},
 	"proxy": {
-		"host": "staples.vtexlocal.com.br",
+		"host": "walmartv5.vtexlocal.com.br",
 		"port": 80
 	},
 	"server": {
