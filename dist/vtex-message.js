@@ -315,8 +315,7 @@
           globalUnknownError = "An unexpected error ocurred.";
           globalError = "Error";
         }
-        showFullError = getCookie("ShowFullError") === "Value=1";
-        if (xhr.getResponseHeader('x-vtex-operation-id') && showFullError) {
+        if (xhr.getResponseHeader('x-vtex-operation-id')) {
           globalError += ' <small class="vtex-operation-id-container">(Operation ID ';
           globalError += '<span class="vtex-operation-id">';
           globalError += decodeURIComponent(xhr.getResponseHeader('x-vtex-operation-id'));
@@ -329,6 +328,7 @@
             errorMessage = decodeURIComponent(xhr.responseText.error.message);
           } else {
             errorMessage = decodeURIComponent(xhr.getResponseHeader('x-vtex-error-message'));
+            showFullError = getCookie("ShowFullError") === "Value=1";
             if (showFullError) {
               errorMessage += '<div class="vtex-error-detail-container">\n	<a href="javascript:void(0);" class="vtex-error-detail-link" onClick="$(\'.vtex-error-detail\').show()">\n		<small>Details</small>\n	</a>\n	<div class="vtex-error-detail" style="display: none;"></div>\n</div>';
               iframe = document.createElement('iframe');

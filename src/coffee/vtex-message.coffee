@@ -230,9 +230,8 @@ class Messages
 				globalUnknownError = "An unexpected error ocurred."
 				globalError = "Error"
 
-			showFullError = getCookie("ShowFullError") is "Value=1"
 
-			if xhr.getResponseHeader('x-vtex-operation-id') and showFullError
+			if xhr.getResponseHeader('x-vtex-operation-id')
 				globalError += ' <small class="vtex-operation-id-container">(Operation ID '
 				globalError += '<span class="vtex-operation-id">' 
 				globalError += decodeURIComponent(xhr.getResponseHeader('x-vtex-operation-id')) 
@@ -245,6 +244,7 @@ class Messages
 					errorMessage = decodeURIComponent(xhr.responseText.error.message)
 				else
 					errorMessage = decodeURIComponent(xhr.getResponseHeader('x-vtex-error-message'))
+					showFullError = getCookie("ShowFullError") is "Value=1"
 					if showFullError
 						errorMessage += '''
 							<div class="vtex-error-detail-container">
