@@ -240,6 +240,21 @@ describe "Messages", ->
 			expect($(message.classes.TITLE, message.domElement).html()).toMatch('foo')
 			expect($(message.classes.DETAIL, message.domElement).html()).toMatch('bar')
 
+		it 'should show button close label', ->
+			# Arrange
+			opts =
+				content:
+					title: 'foo'
+					detail: 'bar'
+				type: 'fatal'
+				close: 'pop'
+
+			# Act
+			message = messages.addMessage(opts, true)
+
+			# Assert
+			expect($('.btn', message.domElement).html()).toMatch('pop')
+
 	describe "AJAX", ->
 
 		ajaxResponses = {}

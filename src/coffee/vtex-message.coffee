@@ -29,6 +29,7 @@ class Message
 			content:
 				title: ''
 				detail: ''
+			close: 'Close'
 			type: 'info'
 			visible: false
 			usingModal: false
@@ -45,7 +46,7 @@ class Message
 				<p class="vtex-message-detail"></p>
 			</div>
 			<div class="modal-footer">
-				<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+				<button class="btn" data-dismiss="modal" aria-hidden="true">"""+@close+"""</button>
 			</div>
 		</div>
 		"""
@@ -226,9 +227,11 @@ class Messages
 			if window.i18n
 				globalUnknownError = window.i18n.t('global.unkownError')
 				globalError = window.i18n.t('global.error')
+				globalClose = window.i18n.t('global.close')
 			else
 				globalUnknownError = "An unexpected error ocurred."
 				globalError = "Error"
+				globalClose = "Close"
 
 
 			if xhr.getResponseHeader('x-vtex-operation-id')
@@ -268,6 +271,7 @@ class Messages
 				content:
 					title: globalError	
 					detail: errorMessage
+				close: globalClose
 
 			@addMessage(messageObj, true)
 
