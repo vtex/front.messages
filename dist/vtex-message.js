@@ -44,6 +44,7 @@
           title: '',
           detail: ''
         },
+        close: 'Close',
         type: 'info',
         visible: false,
         usingModal: false,
@@ -51,7 +52,7 @@
         insertMethod: 'append'
       };
       _.extend(this, defaultProperties, options);
-      modalDefaultTemplate = "<div class=\"vtex-message-template vtex-message-template-modal-default modal hide fade\">\n	<div class=\"modal-header\">\n		<h3 class=\"vtex-message-title\"></h3>\n	</div>\n	<div class=\"modal-body\">\n		<p class=\"vtex-message-detail\"></p>\n	</div>\n	<div class=\"modal-footer\">\n		<button class=\"btn\" data-dismiss=\"modal\" aria-hidden=\"true\">Close</button>\n	</div>\n</div>";
+      modalDefaultTemplate = "<div class=\"vtex-message-template vtex-message-template-modal-default modal hide fade\">\n	<div class=\"modal-header\">\n		<h3 class=\"vtex-message-title\"></h3>\n	</div>\n	<div class=\"modal-body\">\n		<p class=\"vtex-message-detail\"></p>\n	</div>\n	<div class=\"modal-footer\">\n		<button class=\"btn\" data-dismiss=\"modal\" aria-hidden=\"true\">" + this.close + "</button>\n	</div>\n</div>";
       defaultTemplate = "<div class=\"vtex-message-template vtex-message-template-default static-message-template alert\">\n	<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>\n	<h4 class=\"alert-heading vtex-message-title\"></h4>\n	<p class=\"message-text vtex-message-detail\"></p>\n</div>";
       if (this.type === 'fatal') {
         this.usingModal = true;
@@ -301,7 +302,7 @@
     Messages.prototype.bindAjaxError = function() {
       var _this = this;
       return $(document).ajaxError(function(event, xhr, ajaxOptions, thrownError) {
-        var addIframeLater, errorMessage, globalError, globalUnknownError, iframe, isContentJson, messageObj, showFullError, _ref, _ref1;
+        var addIframeLater, errorMessage, globalClose, globalError, globalUnknownError, iframe, isContentJson, messageObj, showFullError, _ref, _ref1;
         if (xhr.status === 401 || xhr.status === 403) {
           return;
         }
@@ -311,9 +312,11 @@
         if (window.i18n) {
           globalUnknownError = window.i18n.t('global.unkownError');
           globalError = window.i18n.t('global.error');
+          globalClose = window.i18n.t('global.close');
         } else {
           globalUnknownError = "An unexpected error ocurred.";
           globalError = "Error";
+          globalClose = "Close";
         }
         if (xhr.getResponseHeader('x-vtex-operation-id')) {
           globalError += ' <small class="vtex-operation-id-container">(Operation ID ';
@@ -346,7 +349,8 @@
           content: {
             title: globalError,
             detail: errorMessage
-          }
+          },
+          close: globalClose
         };
         _this.addMessage(messageObj, true);
         if (addIframeLater) {
