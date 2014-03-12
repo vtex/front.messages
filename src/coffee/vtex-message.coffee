@@ -86,10 +86,10 @@ class Message
 		$(@domElement).hide()
 		$(@domElement).data('vtex-message', @)
 		if @content.title and @content.title isnt ''
-			$(@classes.TITLE, @domElement).html(@content.title)
+			$(@classes.TITLE, @domElement).text(@content.title)
 		else
 			$(@classes.TITLE, @domElement).hide()
-		$(@classes.DETAIL, @domElement).html(@content.detail)
+		$(@classes.DETAIL, @domElement).text(@content.detail)
 
 		if @usingModal
 			$(@domElement).on 'hidden', => @visible = false
