@@ -85,11 +85,18 @@ class Message
 		$(@domElement).addClass(@prefixClassForType+@type+" "+@id+" "+@classes.MESSAGEINSTANCE)
 		$(@domElement).hide()
 		$(@domElement).data('vtex-message', @)
-		if @content.title and @content.title isnt ''
-			$(@classes.TITLE, @domElement).text(@content.title)
-		else
-			$(@classes.TITLE, @domElement).hide()
-		$(@classes.DETAIL, @domElement).text(@content.detail)
+		if @content.html
+			if @content.title and @content.title isnt ''
+				$(@classes.TITLE, @domElement).html(@content.title)
+			else
+				$(@classes.TITLE, @domElement).hide()
+			$(@classes.DETAIL, @domElement).html(@content.detail)
+		else		
+			if @content.title and @content.title isnt ''
+				$(@classes.TITLE, @domElement).text(@content.title)
+			else
+				$(@classes.TITLE, @domElement).hide()
+			$(@classes.DETAIL, @domElement).text(@content.detail)
 
 		if @usingModal
 			$(@domElement).on 'hidden', => @visible = false
@@ -269,8 +276,9 @@ class Messages
 			messageObj =
 				type: 'fatal'
 				content:
-					title: globalError	
+					title: globalError
 					detail: errorMessage
+					html: true
 				close: globalClose
 
 			@addMessage(messageObj, true)
