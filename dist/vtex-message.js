@@ -89,12 +89,21 @@
       $(this.domElement).addClass(this.prefixClassForType + this.type + " " + this.id + " " + this.classes.MESSAGEINSTANCE);
       $(this.domElement).hide();
       $(this.domElement).data('vtex-message', this);
-      if (this.content.title && this.content.title !== '') {
-        $(this.classes.TITLE, this.domElement).text(this.content.title);
+      if (this.content.html) {
+        if (this.content.title && this.content.title !== '') {
+          $(this.classes.TITLE, this.domElement).html(this.content.title);
+        } else {
+          $(this.classes.TITLE, this.domElement).hide();
+        }
+        $(this.classes.DETAIL, this.domElement).html(this.content.detail);
       } else {
-        $(this.classes.TITLE, this.domElement).hide();
+        if (this.content.title && this.content.title !== '') {
+          $(this.classes.TITLE, this.domElement).text(this.content.title);
+        } else {
+          $(this.classes.TITLE, this.domElement).hide();
+        }
+        $(this.classes.DETAIL, this.domElement).text(this.content.detail);
       }
-      $(this.classes.DETAIL, this.domElement).text(this.content.detail);
       if (this.usingModal) {
         $(this.domElement).on('hidden', function() {
           return _this.visible = false;
@@ -348,7 +357,8 @@
           type: 'fatal',
           content: {
             title: globalError,
-            detail: errorMessage
+            detail: errorMessage,
+            html: true
           },
           close: globalClose
         };
