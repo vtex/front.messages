@@ -23,4 +23,4 @@ $ ->
 
 	window.message2 = messages.addMessage(message, true)
 
-	$.ajax("http://staples.vtexlocal.com.br/Site/OutrasFormasPagamento.aspx?IdSku=2008124&PopupComum=true")
+	#$.ajax("http://staples.vtexlocal.com.br/Site/OutrasFormasPagamento.aspx?IdSku=2008124&PopupComum=true")

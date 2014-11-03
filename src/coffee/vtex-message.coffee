@@ -24,7 +24,7 @@ class Message
 			placeholder: @classes.PLACEHOLDER
 			modalPlaceholder: @classes.MODALPLACEHOLDER
 			template: @classes.TEMPLATE
-			time: 0
+			timeout: 0
 			modalTemplate: @classes.MODALTEMPLATE
 			prefixClassForType: @classes.TYPE
 			content:
@@ -149,10 +149,10 @@ class Message
 		else
 			@domElement.show()
 			@visible = true
-			if typeof options is 'object' and options.time? and options.time isnt 0
+			if typeof options is 'object' and options.timeout? and options.timeout isnt 0
 				window.setTimeout =>
-					@domElement.hide()
-				, options.time
+					@hide(options)
+				, options.timeout
 	###*
 	# Esconde a mensagem da tela
 	# @method hide
@@ -193,6 +193,7 @@ class Messages
 			ajaxError: false
 			messagesArray: []
 		_.extend(@, defaultProperties, options)
+		@afterInitiallize()
 
 		@bindAjaxError() if @ajaxError
 
@@ -205,6 +206,7 @@ class Messages
 	###
 	addMessage: (message, show = false) =>
 		messageObj = new Message(message)
+		@deduplicateMessages(messageObj)
 		@messagesArray.push messageObj
 		messageObj.show(message) if show isnt false
 		return messageObj
@@ -223,6 +225,17 @@ class Messages
 					message.domElement.remove()
 					@messagesArray.splice(i,1)
 					return
+
+	deduplicateMessages: (messageObj) =>
+		_.each @messagesArray, (message) =>
+			if (message.content.title is messageObj.content.title) and (message.content.detail is messageObj.content.detail) and (message.usingModal is messageObj.usingModal) and (message.type is messageObj.type)
+				message.hide()
+
+	hideAllMessages: (usingModal) ->
+		_.each @messagesArray, (message) =>
+			if message.visible
+				if message.usingModal is false || usingModal is true
+					message.hide()
 
 	###*
 	# Bind erros de Ajax para exibir modal de erro
@@ -290,6 +303,13 @@ class Messages
 			if addIframeLater
 				$('.vtex-error-detail').html(iframe)
 				addIframeLater = null
+
+	afterInitiallize: ->
+		if window
+			$(window).on "vtex.message.addMessage", (evt, message, show) =>
+				@addMessage(message, if show? then show else true)
+			$(window).on "vtex.message.clearMessage", (evt, usingModal = false) =>
+				@hideAllMessages(usingModal)
 
 	###*
 	# Get cookie
