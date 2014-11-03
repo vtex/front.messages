@@ -1,5 +1,5 @@
 root = exports ? window
-window.vtex or = {}
+window.vtex = window.vtex or {}
 
 ###*
 # Classe Message, que representa uma mensagem
@@ -24,6 +24,7 @@ class Message
 			placeholder: @classes.PLACEHOLDER
 			modalPlaceholder: @classes.MODALPLACEHOLDER
 			template: @classes.TEMPLATE
+			time: 0
 			modalTemplate: @classes.MODALTEMPLATE
 			prefixClassForType: @classes.TYPE
 			content:
@@ -148,7 +149,10 @@ class Message
 		else
 			@domElement.show()
 			@visible = true
-
+			if typeof options is 'object' and options.time? and options.time isnt 0
+				window.setTimeout =>
+					@domElement.hide()
+				, options.time
 	###*
 	# Esconde a mensagem da tela
 	# @method hide
@@ -202,7 +206,7 @@ class Messages
 	addMessage: (message, show = false) =>
 		messageObj = new Message(message)
 		@messagesArray.push messageObj
-		messageObj.show(show) if show isnt false
+		messageObj.show(message) if show isnt false
 		return messageObj
 
 	###*

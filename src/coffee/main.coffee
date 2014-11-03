@@ -19,6 +19,8 @@ $ ->
 			title: 'Erro 2'
 			detail: 'Ocorreu um erro inesperado nos nossos servidores.'
 		type: 'error'
+		time: 4000
+
 	window.message2 = messages.addMessage(message, true)
 
-	#$.ajax("http://staples.vtexlocal.com.br/Site/OutrasFormasPagamento.aspx?IdSku=2008124&PopupComum=true")
+	$.ajax("http://staples.vtexlocal.com.br/Site/OutrasFormasPagamento.aspx?IdSku=2008124&PopupComum=true")
