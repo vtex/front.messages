@@ -12,11 +12,21 @@ module.exports = (grunt) ->
 	config.coffee.main.files[0].cwd = 'src/'
 	config.coffee.main.files[0].dest = 'build/<%= relativePath %>/'
 
+	config.copy.deploy.files = [
+		expand: true
+		cwd: "build/front-messages-ui/script/"
+		src: ['vtex-message.js']
+		dest: "dist/"
+	]
+
+	config.uglify.options.banner = "/*! #{pkg.name} - v#{pkg.version} */\n"
+
 	tasks =
 	# Building block tasks
 		build: ['clean', 'copy:main', 'copy:pkg', 'coffee', 'less']
+		min: ['useminPrepare', 'concat', 'uglify', 'usemin'] # minifies files
 	# Deploy tasks
-		dist: ['build', 'copy:deploy'] # Dist - minifies files
+		dist: ['build', 'min', 'copy:deploy'] # Dist - minifies files
 		test: []
 		vtex_deploy: ['shell:cp', 'shell:cp_br']
 	# Development tasks

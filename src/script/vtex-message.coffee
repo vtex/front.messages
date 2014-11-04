@@ -53,7 +53,7 @@ class Message
 		"""
 
 		defaultTemplate = """
-		<div class="vtex-message-template vtex-message-template-default static-message-template alert">
+		<div class="vtex-message-template vtex-message-template-default static-message-template">
 			<button type="button" class="close" data-dismiss="alert">&times;</button>
 			<h4 class="alert-heading vtex-message-title"></h4>
 			<p class="message-text vtex-message-detail"></p>
@@ -83,7 +83,7 @@ class Message
 			$(@domElement).bind 'closed', => @visible = false
 
 		$(@domElement).removeClass(@classes.TEMPLATE)
-		$(@domElement).addClass(@prefixClassForType+@type+" "+@id+" "+@classes.MESSAGEINSTANCE)
+		$(@domElement).addClass(@id+" "+@classes.MESSAGEINSTANCE)
 		$(@domElement).hide()
 		$(@domElement).data('vtex-message', @)
 		if @content.html
