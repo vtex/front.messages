@@ -1,5 +1,5 @@
 $ ->
-	window.messages = new window.vtex.Messages({ajaxError:true})
+	window.messages = new window.vtex.Messages.getInstance({ajaxError:true})
 
 	message = 
 		content: 

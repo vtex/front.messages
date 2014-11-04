@@ -177,160 +177,167 @@ class Message
 		else
 			@domElement.hide()
 			@visible = false
+
 ###*
 # Classe Messages, que agrupa todas as mensagens
 # @class Messages
 # @constructor
+# É um singleton que instancia VtexMessages
 ###
 class Messages
-	###
-	# Construtor
-	# @param {Object} options propriedades a ser extendida pelo plugin
-	# @return {Object} Messages
-	###
-	constructor: (options = {}) ->
-		defaultProperties = 
-			ajaxError: false
-			messagesArray: []
-		_.extend(@, defaultProperties, options)
-		@afterInitiallize()
+	instance = null
+	@getInstance: (options = {}) ->
+		instance ?= new VtexMessages(options)
 
-		@bindAjaxError() if @ajaxError
+	class VtexMessages
+		###
+		# Construtor
+		# @param {Object} options propriedades a ser extendida pelo plugin
+		# @return {Object} Messages
+		###
+		constructor: (options = {}) ->
+			defaultProperties =
+				ajaxError: false
+				messagesArray: []
+			_.extend(@, defaultProperties, options)
+			@afterInitiallize()
 
-	###*
-	# Adiciona uma mensagem ao objeto Messages, exibe na tela imediatamente caso passado param show como true
-	# @method addMessage
-	# @param {Object} message
-	# @param {Boolean} show caso verdadeiro, após a criação da mensagem, ela será exibida 
-	# @return {Object} retorna a instancia da Message criada
-	###
-	addMessage: (message, show = false) =>
-		messageObj = new Message(message)
-		@deduplicateMessages(messageObj)
-		@messagesArray.push messageObj
-		messageObj.show(message) if show isnt false
-		return messageObj
+			@bindAjaxError() if @ajaxError
 
-	###*
-	# Remove uma mensagem
-	# @method removeMessage
-	# @param {Object} messageProperty objeto Message ou objeto com alguma propriedade da mensagem a ser removida
-	# @return
-	###
-	removeMessage: (messageProperty) =>
-		results = _.where(@messagesArray, messageProperty)
-		for message, i in @messagesArray
-			for res in results
-				if message.id is res.id
-					message.domElement.remove()
-					@messagesArray.splice(i,1)
-					return
+		###*
+		# Adiciona uma mensagem ao objeto Messages, exibe na tela imediatamente caso passado param show como true
+		# @method addMessage
+		# @param {Object} message
+		# @param {Boolean} show caso verdadeiro, após a criação da mensagem, ela será exibida
+		# @return {Object} retorna a instancia da Message criada
+		###
+		addMessage: (message, show = false) =>
+			messageObj = new Message(message)
+			@deduplicateMessages(messageObj)
+			@messagesArray.push messageObj
+			messageObj.show(message) if show isnt false
+			return messageObj
 
-	deduplicateMessages: (messageObj) =>
-		_.each @messagesArray, (message) =>
-			if (message.content.title is messageObj.content.title) and (message.content.detail is messageObj.content.detail) and (message.usingModal is messageObj.usingModal) and (message.type is messageObj.type)
-				message.hide()
+		###*
+		# Remove uma mensagem
+		# @method removeMessage
+		# @param {Object} messageProperty objeto Message ou objeto com alguma propriedade da mensagem a ser removida
+		# @return
+		###
+		removeMessage: (messageProperty) =>
+			results = _.where(@messagesArray, messageProperty)
+			for message, i in @messagesArray
+				for res in results
+					if message.id is res.id
+						message.domElement.remove()
+						@messagesArray.splice(i,1)
+						return
 
-	hideAllMessages: (usingModal) ->
-		_.each @messagesArray, (message) =>
-			if message.visible
-				if message.usingModal is false || usingModal is true
+		deduplicateMessages: (messageObj) =>
+			_.each @messagesArray, (message) =>
+				if (message.content.title is messageObj.content.title) and (message.content.detail is messageObj.content.detail) and (message.usingModal is messageObj.usingModal) and (message.type is messageObj.type)
 					message.hide()
 
-	###*
-	# Bind erros de Ajax para exibir modal de erro
-	# @method bindAjaxError
-	# @return
-	###
-	bindAjaxError: ->
-		$(document).ajaxError (event, xhr, ajaxOptions, thrownError) =>
-			return if xhr.status is 401 or xhr.status is 403
-			# If refresh in the middle of an AJAX
-			if xhr.readyState is 0 or xhr.status is 0 then return
-			
-			if window.i18n
-				globalUnknownError = window.i18n.t('global.unkownError')
-				globalError = window.i18n.t('global.error')
-				globalClose = window.i18n.t('global.close')
-			else
-				globalUnknownError = "An unexpected error ocurred."
-				globalError = "Error"
-				globalClose = "Close"
+		hideAllMessages: (usingModal) ->
+			_.each @messagesArray, (message) =>
+				if message.visible
+					if message.usingModal is false || usingModal is true
+						message.hide()
 
+		###*
+		# Bind erros de Ajax para exibir modal de erro
+		# @method bindAjaxError
+		# @return
+		###
+		bindAjaxError: ->
+			$(document).ajaxError (event, xhr, ajaxOptions, thrownError) =>
+				return if xhr.status is 401 or xhr.status is 403
+				# If refresh in the middle of an AJAX
+				if xhr.readyState is 0 or xhr.status is 0 then return
 
-			if xhr.getResponseHeader('x-vtex-operation-id')
-				globalError += ' <small class="vtex-operation-id-container">(Operation ID '
-				globalError += '<span class="vtex-operation-id">' 
-				globalError += decodeURIComponent(xhr.getResponseHeader('x-vtex-operation-id')) 
-				globalError += '</span>'
-				globalError += ')</small>'
-
-			if xhr.getResponseHeader('x-vtex-error-message')
-				isContentJson = xhr.getResponseHeader('Content-Type')?.indexOf('application/json') isnt -1
-				if isContentJson and xhr.responseText.error?.message?
-					errorMessage = decodeURIComponent(xhr.responseText.error.message)
+				if window.i18n
+					globalUnknownError = window.i18n.t('global.unkownError')
+					globalError = window.i18n.t('global.error')
+					globalClose = window.i18n.t('global.close')
 				else
-					errorMessage = decodeURIComponent(xhr.getResponseHeader('x-vtex-error-message'))
-					showFullError = getCookie("ShowFullError") is "Value=1"
-					if showFullError
-						errorMessage += '''
-							<div class="vtex-error-detail-container">
-								<a href="javascript:void(0);" class="vtex-error-detail-link" onClick="$('.vtex-error-detail').show()">
-									<small>Details</small>
-								</a>
-								<div class="vtex-error-detail" style="display: none;"></div>
-							</div>
-						'''
-						iframe = document.createElement('iframe')
-						iframe.src = 'data:text/html;charset=utf-8,' + decodeURIComponent(xhr.responseText)
-						$(iframe).css('width', '100%')
-						$(iframe).css('height', '900px')
-						addIframeLater = true
-			else 
-				errorMessage = globalUnknownError
+					globalUnknownError = "An unexpected error ocurred."
+					globalError = "Error"
+					globalClose = "Close"
 
-			# Exibe mensagem na tela
-			messageObj =
-				type: 'fatal'
-				content:
-					title: globalError
-					detail: errorMessage
-					html: true
-				close: globalClose
 
-			@addMessage(messageObj, true)
+				if xhr.getResponseHeader('x-vtex-operation-id')
+					globalError += ' <small class="vtex-operation-id-container">(Operation ID '
+					globalError += '<span class="vtex-operation-id">'
+					globalError += decodeURIComponent(xhr.getResponseHeader('x-vtex-operation-id'))
+					globalError += '</span>'
+					globalError += ')</small>'
 
-			if addIframeLater
-				$('.vtex-error-detail').html(iframe)
-				addIframeLater = null
+				if xhr.getResponseHeader('x-vtex-error-message')
+					isContentJson = xhr.getResponseHeader('Content-Type')?.indexOf('application/json') isnt -1
+					if isContentJson and xhr.responseText.error?.message?
+						errorMessage = decodeURIComponent(xhr.responseText.error.message)
+					else
+						errorMessage = decodeURIComponent(xhr.getResponseHeader('x-vtex-error-message'))
+						showFullError = getCookie("ShowFullError") is "Value=1"
+						if showFullError
+							errorMessage += '''
+								<div class="vtex-error-detail-container">
+									<a href="javascript:void(0);" class="vtex-error-detail-link" onClick="$('.vtex-error-detail').show()">
+										<small>Details</small>
+									</a>
+									<div class="vtex-error-detail" style="display: none;"></div>
+								</div>
+							'''
+							iframe = document.createElement('iframe')
+							iframe.src = 'data:text/html;charset=utf-8,' + decodeURIComponent(xhr.responseText)
+							$(iframe).css('width', '100%')
+							$(iframe).css('height', '900px')
+							addIframeLater = true
+				else
+					errorMessage = globalUnknownError
 
-	afterInitiallize: ->
-		if window
-			$(window).on "vtex.message.addMessage", (evt, message, show) =>
-				@addMessage(message, if show? then show else true)
-			$(window).on "vtex.message.clearMessage", (evt, usingModal = false) =>
-				@hideAllMessages(usingModal)
+				# Exibe mensagem na tela
+				messageObj =
+					type: 'fatal'
+					content:
+						title: globalError
+						detail: errorMessage
+						html: true
+					close: globalClose
 
-	###*
-	# Get cookie
-	# @private
-	# @method getCookie
-	# @param {String} name nome do cookie
-	# @return {String} valor do cookie
-	###
-	getCookie = (name) ->
-		cookieValue = null
-		if document.cookie and document.cookie isnt ""
-			cookies = document.cookie.split(";")
-			i = 0
+				@addMessage(messageObj, true)
 
-			while i < cookies.length
-				cookie = (cookies[i] or "").replace(/^\s+|\s+$/g, "")
-				if cookie.substring(0, name.length + 1) is (name + "=")
-					cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
-					break
-				i++
-		cookieValue
+				if addIframeLater
+					$('.vtex-error-detail').html(iframe)
+					addIframeLater = null
+
+		afterInitiallize: ->
+			if window
+				$(window).on "vtex.message.addMessage", (evt, message, show) =>
+					@addMessage(message, if show? then show else true)
+				$(window).on "vtex.message.clearMessage", (evt, usingModal = false) =>
+					@hideAllMessages(usingModal)
+
+		###*
+		# Get cookie
+		# @private
+		# @method getCookie
+		# @param {String} name nome do cookie
+		# @return {String} valor do cookie
+		###
+		getCookie = (name) ->
+			cookieValue = null
+			if document.cookie and document.cookie isnt ""
+				cookies = document.cookie.split(";")
+				i = 0
+
+				while i < cookies.length
+					cookie = (cookies[i] or "").replace(/^\s+|\s+$/g, "")
+					if cookie.substring(0, name.length + 1) is (name + "=")
+						cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
+						break
+					i++
+			cookieValue
 		
 # exports
 root.vtex.Messages = Messages
