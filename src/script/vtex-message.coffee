@@ -193,18 +193,18 @@ class Messages
 		###
 		# Construtor
 		# @param {Object} options propriedades a ser extendida pelo plugin
-		# @return {Object} Messages
+		# @return {Object} VtexMessages
 		###
 		constructor: (options = {}) ->
 			defaultProperties =
 				ajaxError: false
 				messagesArray: []
 			_.extend(@, defaultProperties, options)
-			@afterInitiallize()
 
+			@startListeners()
 			@bindAjaxError() if @ajaxError
 
-		###*
+		###
 		# Adiciona uma mensagem ao objeto Messages, exibe na tela imediatamente caso passado param show como true
 		# @method addMessage
 		# @param {Object} message
@@ -216,9 +216,8 @@ class Messages
 			@deduplicateMessages(messageObj)
 			@messagesArray.push messageObj
 			messageObj.show(message) if show isnt false
-			return messageObj
 
-		###*
+		###
 		# Remove uma mensagem
 		# @method removeMessage
 		# @param {Object} messageProperty objeto Message ou objeto com alguma propriedade da mensagem a ser removida
@@ -244,7 +243,7 @@ class Messages
 					if message.usingModal is false || usingModal is true
 						message.hide()
 
-		###*
+		###
 		# Bind erros de Ajax para exibir modal de erro
 		# @method bindAjaxError
 		# @return
@@ -311,14 +310,14 @@ class Messages
 					$('.vtex-error-detail').html(iframe)
 					addIframeLater = null
 
-		afterInitiallize: ->
+		startListeners: ->
 			if window
 				$(window).on "vtex.message.addMessage", (evt, message, show) =>
 					@addMessage(message, if show? then show else true)
 				$(window).on "vtex.message.clearMessage", (evt, usingModal = false) =>
 					@hideAllMessages(usingModal)
 
-		###*
+		###
 		# Get cookie
 		# @private
 		# @method getCookie
@@ -330,7 +329,6 @@ class Messages
 			if document.cookie and document.cookie isnt ""
 				cookies = document.cookie.split(";")
 				i = 0
-
 				while i < cookies.length
 					cookie = (cookies[i] or "").replace(/^\s+|\s+$/g, "")
 					if cookie.substring(0, name.length + 1) is (name + "=")
