@@ -54,7 +54,7 @@
       };
       _.extend(this, defaultProperties, options);
       modalDefaultTemplate = "<div class=\"vtex-message-template vtex-message-template-modal-default modal hide fade\">\n	<div class=\"modal-header\">\n		<h3 class=\"vtex-message-title\"></h3>\n	</div>\n	<div class=\"modal-body\">\n		<p class=\"vtex-message-detail\"></p>\n	</div>\n	<div class=\"modal-footer\">\n		<button class=\"btn\" data-dismiss=\"modal\" aria-hidden=\"true\">" + this.close + "</button>\n	</div>\n</div>";
-      defaultTemplate = "<div class=\"vtex-message-template vtex-message-template-default static-message-template alert\">\n	<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>\n	<h4 class=\"alert-heading vtex-message-title\"></h4>\n	<p class=\"message-text vtex-message-detail\"></p>\n</div>";
+      defaultTemplate = "<div class=\"vtex-message-template vtex-message-template-default static-message-template\">\n	<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>\n	<h4 class=\"alert-heading vtex-message-title\"></h4>\n	<p class=\"message-text vtex-message-detail\"></p>\n</div>";
       if (this.type === 'fatal') {
         this.usingModal = true;
       }
@@ -87,7 +87,7 @@
         });
       }
       $(this.domElement).removeClass(this.classes.TEMPLATE);
-      $(this.domElement).addClass(this.prefixClassForType + this.type + " " + this.id + " " + this.classes.MESSAGEINSTANCE);
+      $(this.domElement).addClass(this.id + " " + this.classes.MESSAGEINSTANCE);
       $(this.domElement).hide();
       $(this.domElement).data('vtex-message', this);
       if (this.content.html) {

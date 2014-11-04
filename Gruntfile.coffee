@@ -19,14 +19,17 @@ module.exports = (grunt) ->
 		dest: "dist/"
 	]
 
-	config.uglify.options.banner = "/*! #{pkg.name} - v#{pkg.version} */\n"
+	config.uglify.options.banner = "/* #{pkg.name} - v#{pkg.version} */\n"
+	config.uglify.target =
+		files:
+			'dist/vtex-message.min.js': ['dist/vtex-message.js']
 
 	tasks =
 	# Building block tasks
 		build: ['clean', 'copy:main', 'copy:pkg', 'coffee', 'less']
-		min: ['useminPrepare', 'concat', 'uglify', 'usemin'] # minifies files
+		min: ['uglify'] # minifies files
 	# Deploy tasks
-		dist: ['build', 'min', 'copy:deploy'] # Dist - minifies files
+		dist: ['build', 'copy:deploy', 'min'] # Dist - minifies files
 		test: []
 		vtex_deploy: ['shell:cp', 'shell:cp_br']
 	# Development tasks
