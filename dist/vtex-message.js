@@ -271,7 +271,7 @@
           messagesArray: []
         };
         _.extend(this, defaultProperties, options);
-        this.startListeners();
+        this.startEventListeners();
         if (this.ajaxError) {
           this.bindAjaxError();
         }
@@ -413,7 +413,7 @@
         });
       };
 
-      VtexMessages.prototype.startListeners = function() {
+      VtexMessages.prototype.startEventListeners = function() {
         var _this = this;
         if (window) {
           $(window).on("vtex.message.addMessage", function(evt, message, show) {

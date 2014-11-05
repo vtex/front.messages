@@ -133,6 +133,7 @@ class Message
 				$(@domElement).on 'show', => @visible = true
 				$(@domElement).modal('show')
 
+			vtex.Messages.getInstance().changeContainerVisibility()
 			return
 
 		if typeof options is 'object' and options.complete? and typeof options.complete is 'function'
@@ -150,7 +151,10 @@ class Message
 				window.setTimeout =>
 					@hide(options)
 				, options.timeout
-	###*
+
+		vtex.Messages.getInstance().changeContainerVisibility()
+
+	###
 	# Esconde a mensagem da tela
 	# @method hide
 	# @param {Object|Number} options caso preenchido, será passado como parametro para o método 
@@ -161,6 +165,7 @@ class Message
 		if @usingModal
 			@domElement.modal('hide')
 			@visible = false
+			vtex.Messages.getInstance().changeContainerVisibility()
 			return
 
 		if typeof options is 'object' and options.complete? and typeof options.complete is 'function'
@@ -175,7 +180,9 @@ class Message
 			@domElement.hide()
 			@visible = false
 
-###*
+		vtex.Messages.getInstance().changeContainerVisibility()
+
+###
 # Classe Messages, que agrupa todas as mensagens
 # @class Messages
 # @constructor
@@ -204,8 +211,8 @@ class Messages
 				modalPlaceholder: @classes.MODALPLACEHOLDER
 			_.extend(@, defaultProperties, options)
 
-			@startPlaceholders()
-			@startListeners()
+			@buildPlaceholderTemplate()
+			@startEventListeners()
 			@bindAjaxError() if @ajaxError
 
 		###
@@ -215,7 +222,7 @@ class Messages
 		# @param {Boolean} show caso verdadeiro, após a criação da mensagem, ela será exibida
 		# @return {Object} retorna a instancia da Message criada
 		###
-		addMessage: (message, show = false) =>
+		addMessage: (message, show = false) ->
 			messageObj = new Message(message)
 			@deduplicateMessages(messageObj)
 			@messagesArray.push messageObj
@@ -229,7 +236,7 @@ class Messages
 		# @param {Object} messageProperty objeto Message ou objeto com alguma propriedade da mensagem a ser removida
 		# @return
 		###
-		removeMessage: (messageProperty) =>
+		removeMessage: (messageProperty) ->
 			results = _.where(@messagesArray, messageProperty)
 			for message, i in @messagesArray
 				for res in results
@@ -238,17 +245,43 @@ class Messages
 						@messagesArray.splice(i,1)
 						return
 
-		deduplicateMessages: (messageObj) =>
+		###
+		# Esconde mensagens duplicadas
+		# @method deduplicateMessages
+		# @param {Object} messageObj objeto Message contra o qual as outras mensagens devem ser testadas
+		# @return
+		###
+		deduplicateMessages: (messageObj) ->
 			_.each @messagesArray, (message) =>
 				if (message.content.title is messageObj.content.title) and (message.content.detail is messageObj.content.detail) and (message.usingModal is messageObj.usingModal) and (message.type is messageObj.type)
 					message.hide()
 
+		###
+		# Esconde todas as mensagens
+		# @method hideAllMessages
+		# @param {Boolean} usingModal Flag que indica se as mensagems modais também devem ser escondidas
+		# @return
+		###
 		hideAllMessages: (usingModal) ->
 			_.each @messagesArray, (message) =>
 				if message.visible
 					if message.usingModal is false || usingModal is true
 						message.hide()
-			$(vtex.Messages.getInstance().placeholder).hide();
+			@.changeContainerVisibility();
+
+		###
+		# Verifica se o container deve ser escondido, ele será escondido caso não hajam mensagens sendo exibidas
+		# @method changeContainerVisibility
+		# @param
+		# @return
+		###
+		changeContainerVisibility: ->
+			notModalMessages = _.filter @messagesArray, (message) =>
+				message.usingModal is false
+			hasMessages = _.find notModalMessages, (message) =>
+				message.visible is true
+			if !hasMessages
+				$(vtex.Messages.getInstance().placeholder).hide();
 
 		###
 		# Bind erros de Ajax para exibir modal de erro
@@ -317,17 +350,28 @@ class Messages
 					$('.vtex-error-detail').html(iframe)
 					addIframeLater = null
 
-		startPlaceholders: ->
+		###
+		# Constrói o template do placeholder
+		# @method buildPlaceholderTemplate
+		# @param
+		# @return
+		###
+		buildPlaceholderTemplate: ->
 			$(".vtex-front-message-placeholder").append("""<button type="button" class="vtex-front-message-close-all close">×</button>""");
 
-		startListeners: ->
+		###
+		# Inicia a API de eventos
+		# @method startEventListeners
+		# @param
+		# @return
+		###
+		startEventListeners: ->
 			if window
 				$(window).on "vtex.message.addMessage", (evt, message, show) =>
 					@addMessage(message, if show? then show else true)
 				$(window).on "vtex.message.clearMessage", (evt, usingModal = false) =>
 					@hideAllMessages(usingModal)
 				$(".vtex-front-message-close-all").on "click", (evt, usingModal = false) =>
-					console.log("clicou no fechar todos")
 					@hideAllMessages(usingModal)
 
 		###
