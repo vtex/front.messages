@@ -11,18 +11,15 @@ class Message
 		@classes =			
 			TEMPLATEDEFAULT: '.vtex-message-template.vtex-message-template-default'
 			MODALTEMPLATEDEFAULT: '.vtex-message-template.vtex-message-template-modal-default'
-			PLACEHOLDER: '.vtex-front-message-placeholder'
-			MODALPLACEHOLDER: 'body'
 			TEMPLATE: 'vtex-message-template'
-			TITLE: '.vtex-message-title'
-			DETAIL: '.vtex-message-detail'
-			TYPE: 'alert-'
-			MESSAGEINSTANCE: 'vtex-message-instance'
+			TITLE: '.vtex-front-message-title'
+			SEPARATOR: '.vtex-front-message-separator'
+			DETAIL: '.vtex-front-message-detail'
+			TYPE: 'vtex-front-message-type-'
+			MESSAGEINSTANCE: 'vtex-front-message-instance'
 
 		defaultProperties =
 			id: _.uniqueId('vtex-message-')
-			placeholder: @classes.PLACEHOLDER
-			modalPlaceholder: @classes.MODALPLACEHOLDER
 			template: @classes.TEMPLATE
 			timeout: 0
 			modalTemplate: @classes.MODALTEMPLATE
@@ -53,17 +50,15 @@ class Message
 		"""
 
 		defaultTemplate = """
-		<div class="vtex-message-template vtex-message-template-default static-message-template">
-			<button type="button" class="close hide" data-dismiss="alert">&times;</button>
-			<h4 class="alert-heading vtex-message-title"></h4>
-			<p class="message-text vtex-message-detail"></p>
+		<div class="vtex-front-message-template vtex-front-message-template-default static-front-message-template">
+			<span class="vtex-front-message-title"></span><span class="vtex-front-message-separator"> - </span><span 			class="vtex-front-message-detail"></span>
 		</div>
 		"""
 
 		if @type is 'fatal' then @usingModal = true
 
 		if @usingModal
-			if not $(@modalPlaceholder)[0] then throw new Error("Couldn't find placeholder for modal Message")
+			if not $(vtex.Messages.getInstance().placeholder)[0] then throw new Error("Couldn't find placeholder for modal Message")
 			
 			if @modalTemplate is @classes.MODALTEMPLATE
 				@modalTemplate = modalDefaultTemplate
@@ -72,7 +67,7 @@ class Message
 
 			@domElement = $(@modalTemplate)
 		else
-			if not $(@placeholder)[0] then throw new Error("Couldn't find placeholder for Message")
+			if not $(vtex.Messages.getInstance().placeholder)[0] then throw new Error("Couldn't find placeholder for Message")
 
 			if @template is @classes.TEMPLATE
 				@template = defaultTemplate
@@ -83,7 +78,7 @@ class Message
 			$(@domElement).bind 'closed', => @visible = false
 
 		$(@domElement).removeClass(@classes.TEMPLATE)
-		$(@domElement).addClass(@id+" "+@classes.MESSAGEINSTANCE)
+		$(@domElement).addClass(@id + " " + @classes.MESSAGEINSTANCE + " " + @classes.TYPE + @type)
 		$(@domElement).hide()
 		$(@domElement).data('vtex-message', @)
 		if @content.html
@@ -91,19 +86,21 @@ class Message
 				$(@classes.TITLE, @domElement).html(@content.title)
 			else
 				$(@classes.TITLE, @domElement).hide()
+				$(@classes.SEPARATOR, @domElement).hide()
 			$(@classes.DETAIL, @domElement).html(@content.detail)
 		else		
 			if @content.title and @content.title isnt ''
 				$(@classes.TITLE, @domElement).text(@content.title)
 			else
 				$(@classes.TITLE, @domElement).hide()
+				$(@classes.SEPARATOR, @domElement).hide()
 			$(@classes.DETAIL, @domElement).text(@content.detail)
 
 		if @usingModal
 			$(@domElement).on 'hidden', => @visible = false
-			$(@modalPlaceholder).append(@domElement)
+			$(vtex.Messages.getInstance().modalPlaceholder).append(@domElement)
 		else
-			$(@placeholder)[@insertMethod](@domElement)
+			$(vtex.Messages.getInstance().placeholder)[@insertMethod](@domElement)
 
 		if @visible then @show()
 
