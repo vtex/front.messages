@@ -11,7 +11,7 @@ class Message
 		@classes =			
 			TEMPLATEDEFAULT: '.vtex-message-template.vtex-message-template-default'
 			MODALTEMPLATEDEFAULT: '.vtex-message-template.vtex-message-template-modal-default'
-			PLACEHOLDER: '.vtex-message-placeholder'
+			PLACEHOLDER: '.vtex-front-message-placeholder'
 			MODALPLACEHOLDER: 'body'
 			TEMPLATE: 'vtex-message-template'
 			TITLE: '.vtex-message-title'
@@ -54,7 +54,7 @@ class Message
 
 		defaultTemplate = """
 		<div class="vtex-message-template vtex-message-template-default static-message-template">
-			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<button type="button" class="close hide" data-dismiss="alert">&times;</button>
 			<h4 class="alert-heading vtex-message-title"></h4>
 			<p class="message-text vtex-message-detail"></p>
 		</div>
@@ -196,11 +196,18 @@ class Messages
 		# @return {Object} VtexMessages
 		###
 		constructor: (options = {}) ->
+			@classes =
+				PLACEHOLDER: '.vtex-front-message-placeholder'
+				MODALPLACEHOLDER: 'body'
+
 			defaultProperties =
 				ajaxError: false
 				messagesArray: []
+				placeholder: @classes.PLACEHOLDER
+				modalPlaceholder: @classes.MODALPLACEHOLDER
 			_.extend(@, defaultProperties, options)
 
+			@startPlaceholders()
 			@startListeners()
 			@bindAjaxError() if @ajaxError
 
@@ -216,6 +223,8 @@ class Messages
 			@deduplicateMessages(messageObj)
 			@messagesArray.push messageObj
 			messageObj.show(message) if show isnt false
+			if (!messageObj.usingModal)
+				$(vtex.Messages.getInstance().placeholder).show();
 
 		###
 		# Remove uma mensagem
@@ -242,6 +251,7 @@ class Messages
 				if message.visible
 					if message.usingModal is false || usingModal is true
 						message.hide()
+			$(vtex.Messages.getInstance().placeholder).hide();
 
 		###
 		# Bind erros de Ajax para exibir modal de erro
@@ -310,11 +320,17 @@ class Messages
 					$('.vtex-error-detail').html(iframe)
 					addIframeLater = null
 
+		startPlaceholders: ->
+			$(".vtex-front-message-placeholder").append("""<button type="button" class="vtex-front-message-close-all close">×</button>""");
+
 		startListeners: ->
 			if window
 				$(window).on "vtex.message.addMessage", (evt, message, show) =>
 					@addMessage(message, if show? then show else true)
 				$(window).on "vtex.message.clearMessage", (evt, usingModal = false) =>
+					@hideAllMessages(usingModal)
+				$(".vtex-front-message-close-all").on "click", (evt, usingModal = false) =>
+					console.log("clicou no fechar todos")
 					@hideAllMessages(usingModal)
 
 		###

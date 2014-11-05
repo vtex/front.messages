@@ -12,7 +12,7 @@ $ ->
 			console.log("Mostrei", $('.btn',m.domElement))
 			$('.btn',m.domElement).focus()
 	
-	window.message1 = messages.addMessage(message, modalOpts)
+	# window.message1 = messages.addMessage(message, modalOpts)
 
 	message = 
 		content: 
