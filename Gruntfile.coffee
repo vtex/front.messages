@@ -12,24 +12,31 @@ module.exports = (grunt) ->
 	config.coffee.main.files[0].cwd = 'src/'
 	config.coffee.main.files[0].dest = 'build/<%= relativePath %>/'
 
-	config.copy.deploy.files = [
-		expand: true
-		cwd: "build/front-messages-ui/script/"
-		src: ['vtex-message.js']
-		dest: "dist/"
-	]
-
 	config.uglify.options.banner = "/* #{pkg.name} - v#{pkg.version} */\n"
 	config.uglify.target =
 		files:
-			'dist/vtex-message.min.js': ['dist/vtex-message.js']
+			'dist/vtex-message.min.js': ['build/front-messages-ui/script/vtex-message.js']
+
+	config.less.main.files[0].src = ['style.less', 'print.less', 'vtex-message.less']
+
+	config.cssmin =
+		target:
+			files: [
+				expand: true,
+				cwd: "build/front-messages-ui/style/"
+				src: ['vtex-message.css'],
+				dest: 'dist/',
+				ext: '.min.css'
+			]
+			options:
+				banner: "/* #{pkg.name} - v#{pkg.version} */\n"
 
 	tasks =
 	# Building block tasks
 		build: ['clean', 'copy:main', 'copy:pkg', 'coffee', 'less']
 		min: ['uglify'] # minifies files
 	# Deploy tasks
-		dist: ['build', 'copy:deploy', 'min'] # Dist - minifies files
+		dist: ['build', 'copy:deploy', 'min', 'cssmin'] # Dist - minifies files
 		test: []
 		vtex_deploy: ['shell:cp', 'shell:cp_br']
 	# Development tasks
