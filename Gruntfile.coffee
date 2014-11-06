@@ -31,13 +31,19 @@ module.exports = (grunt) ->
 			options:
 				banner: "/* #{pkg.name} - v#{pkg.version} */\n"
 
+	config.copy.test =
+		expand: true
+		cwd: 'spec/'
+		src: ['**', '!**/*.coffee']
+		dest: 'build/<%= relativePath %>/spec/'
+
 	tasks =
 	# Building block tasks
 		build: ['clean', 'copy:main', 'copy:pkg', 'coffee', 'less']
 		min: ['uglify'] # minifies files
 	# Deploy tasks
 		dist: ['build', 'min', 'cssmin'] # Dist - minifies files
-		test: []
+		test: ['default', 'karma:unit', 'watch:test']
 		vtex_deploy: ['shell:cp', 'shell:cp_br']
 	# Development tasks
 		dev: ['nolr', 'build', 'watch']
