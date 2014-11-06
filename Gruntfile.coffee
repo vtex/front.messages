@@ -36,7 +36,7 @@ module.exports = (grunt) ->
 		build: ['clean', 'copy:main', 'copy:pkg', 'coffee', 'less']
 		min: ['uglify'] # minifies files
 	# Deploy tasks
-		dist: ['build', 'copy:deploy', 'min', 'cssmin'] # Dist - minifies files
+		dist: ['build', 'min', 'cssmin'] # Dist - minifies files
 		test: []
 		vtex_deploy: ['shell:cp', 'shell:cp_br']
 	# Development tasks
