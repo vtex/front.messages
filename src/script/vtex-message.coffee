@@ -11,7 +11,7 @@ class Message
 		@classes =			
 			TEMPLATEDEFAULT: '.vtex-message-template.vtex-message-template-default'
 			MODALTEMPLATEDEFAULT: '.vtex-message-template.vtex-message-template-modal-default'
-			TEMPLATE: 'vtex-message-template'
+			TEMPLATE: 'vtex-front-messager-container'
 			TITLE: '.vtex-front-message-title'
 			SEPARATOR: '.vtex-front-message-separator'
 			DETAIL: '.vtex-front-message-detail'
@@ -50,8 +50,10 @@ class Message
 		"""
 
 		defaultTemplate = """
+		<div class="vtex-front-message-container">
 		<div class="vtex-front-message-template vtex-front-message-template-default static-front-message-template">
 			<span class="vtex-front-message-title"></span><span class="vtex-front-message-separator"> - </span><span 			class="vtex-front-message-detail"></span>
+		</div>
 		</div>
 		"""
 
@@ -77,8 +79,8 @@ class Message
 			@domElement = $(@template).clone(false, false)
 			$(@domElement).bind 'closed', => @visible = false
 
-		$(@domElement).removeClass(@classes.TEMPLATE)
-		$(@domElement).addClass(@id + " " + @classes.MESSAGEINSTANCE + " " + @classes.TYPE + @type)
+		#$(@domElement).removeClass(@classes.TEMPLATE)
+		$(@domElement).find(".vtex-front-message-template").addClass(@id + " " + @classes.MESSAGEINSTANCE + " " + @classes.TYPE + @type)
 		$(@domElement).hide()
 		$(@domElement).data('vtex-message', @)
 		if @content.html

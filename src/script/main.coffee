@@ -19,7 +19,6 @@ $ ->
 			title: 'Erro 2'
 			detail: 'Ocorreu um erro inesperado nos nossos servidores.'
 		type: 'error'
-		time: 4000
 
 	window.message2 = messages.addMessage(message, true)
 
