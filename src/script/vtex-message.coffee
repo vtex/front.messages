@@ -9,17 +9,17 @@ window.vtex = window.vtex or {}
 class Message
 	constructor: (options = {}) ->
 		@classes =			
-			TEMPLATEDEFAULT: '.vtex-message-template.vtex-message-template-default'
-			MODALTEMPLATEDEFAULT: '.vtex-message-template.vtex-message-template-modal-default'
-			TEMPLATE: 'vtex-front-messager-container'
-			TITLE: '.vtex-front-message-title'
-			SEPARATOR: '.vtex-front-message-separator'
-			DETAIL: '.vtex-front-message-detail'
-			TYPE: 'vtex-front-message-type-'
-			MESSAGEINSTANCE: 'vtex-front-message-instance'
+			TEMPLATEDEFAULT: '.vtex-front-messages-template.vtex-front-messages-template-default'
+			MODALTEMPLATEDEFAULT: '.vtex-front-messages-template.vtex-front-messages-template-modal-default'
+			TEMPLATE: 'vtex-front-messages-container'
+			TITLE: '.vtex-front-messages-title'
+			SEPARATOR: '.vtex-front-messages-separator'
+			DETAIL: '.vtex-front-messages-detail'
+			TYPE: 'vtex-front-messages-type-'
+			MESSAGEINSTANCE: 'vtex-front-messages-instance'
 
 		defaultProperties =
-			id: _.uniqueId('vtex-message-')
+			id: _.uniqueId('vtex-front-message-')
 			template: @classes.TEMPLATE
 			timeout: 0
 			modalTemplate: @classes.MODALTEMPLATE
@@ -36,12 +36,12 @@ class Message
 		_.extend(@, defaultProperties, options)
 
 		modalDefaultTemplate = """
-		<div class="vtex-message-template vtex-message-template-modal-default modal hide fade">
+		<div class="vtex-front-messages-template vtex-front-messages-template-modal-default modal hide fade">
 			<div class="modal-header">
-				<h3 class="vtex-message-title"></h3>
+				<h3 class="vtex-front-messages-title"></h3>
 			</div>
 			<div class="modal-body">
-				<p class="vtex-message-detail"></p>
+				<p class="vtex-front-messages-detail"></p>
 			</div>
 			<div class="modal-footer">
 				<button class="btn" data-dismiss="modal" aria-hidden="true">"""+@close+"""</button>
@@ -50,9 +50,9 @@ class Message
 		"""
 
 		defaultTemplate = """
-		<div class="vtex-front-message-container">
-		<div class="vtex-front-message-template vtex-front-message-template-default static-front-message-template">
-			<span class="vtex-front-message-title"></span><span class="vtex-front-message-separator"> - </span><span 			class="vtex-front-message-detail"></span>
+		<div class="vtex-front-messages-container">
+		<div class="vtex-front-messages-template vtex-front-messages-template-default static-front-messages-template">
+			<span class="vtex-front-messages-title"></span><span class="vtex-front-messages-separator"> - </span><span 						class="vtex-front-messages-detail"></span>
 		</div>
 		</div>
 		"""
@@ -80,7 +80,7 @@ class Message
 			$(@domElement).bind 'closed', => @visible = false
 
 		#$(@domElement).removeClass(@classes.TEMPLATE)
-		$(@domElement).find(".vtex-front-message-template").addClass(@id + " " + @classes.MESSAGEINSTANCE + " " + @classes.TYPE + @type)
+		$(@domElement).find(".vtex-front-messages-template").addClass(@id + " " + @classes.MESSAGEINSTANCE + " " + @classes.TYPE + @type)
 		$(@domElement).hide()
 		$(@domElement).data('vtex-message', @)
 		if @content.html
@@ -203,7 +203,7 @@ class Messages
 		###
 		constructor: (options = {}) ->
 			@classes =
-				PLACEHOLDER: '.vtex-front-message-placeholder'
+				PLACEHOLDER: '.vtex-front-messages-placeholder'
 				MODALPLACEHOLDER: 'body'
 
 			defaultProperties =
@@ -359,7 +359,7 @@ class Messages
 		# @return
 		###
 		buildPlaceholderTemplate: ->
-			$(".vtex-front-message-placeholder").append("""<button type="button" class="vtex-front-message-close-all close">×</button>""");
+			$(".vtex-front-messages-placeholder").append("""<button type="button" class="vtex-front-messages-close-all close">×</button>""");
 
 		###
 		# Inicia a API de eventos
@@ -373,7 +373,7 @@ class Messages
 					@addMessage(message, if show? then show else true)
 				$(window).on "vtex.message.clearMessage", (evt, usingModal = false) =>
 					@hideAllMessages(usingModal)
-				$(".vtex-front-message-close-all").on "click", (evt, usingModal = false) =>
+				$(".vtex-front-messages-close-all").on "click", (evt, usingModal = false) =>
 					@hideAllMessages(usingModal)
 
 		###
