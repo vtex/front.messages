@@ -151,9 +151,10 @@ describe "Messages", ->
     messages = undefined
 
     beforeEach ->
-      #loadJSONFixtures("messages-api.json")
-      #responseJSON = fixtures["messages-api.json"]
-      messages = new window.vtex.Messages({ajaxError: true})
+#      loadJSONFixtures("messages-api.json")
+#      responseJSON = fixtures["messages-api.json"]
+      messages = new window.vtex.Messages.getInstance({ajaxError: true})
+      $(window).trigger("clearMessages.vtex", [true])
       jasmine.Ajax.useMock()
       ajaxResponses = {
         "success": {
@@ -191,19 +192,17 @@ describe "Messages", ->
         }
       }
 
-    it "should show a modal Message when an AJAX error occurs", ->
+    it "should show modal Message when an AJAX error occurs", ->
       # Arrange
       $.support.transition = false
 
       # Act
-      $.ajax("http://httpstat.us/500")
+      $.get("http://httpstat.us/500")
       request = mostRecentAjaxRequest()
       request.response(ajaxResponses.fatalError)
 
       # Assert
-      expect(messages.messagesArray.length).toBe(1)
-      message = messages.messagesArray[0]
-      expect(message.usingModal).toBe(true)
+      expect($(".vtex-front-messages-template-modal-default", "body")).toExist()
 
     it "should not show a modal Message when a non-error AJAX occurs", ->
       # Arrange
@@ -214,7 +213,7 @@ describe "Messages", ->
       request1.response(ajaxResponses.success)
 
       # Assert
-      expect(messages.messagesArray.length).toBe(0)
+      expect($(".vtex-front-messages-template-modal-default", "body")).not.toExist()
 
     it 'should show a modal Message when an AJAX error when API is using VTEX.WebApi', ->
       # Arrange
