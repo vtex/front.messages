@@ -29,7 +29,6 @@ class Message
         detail: ''
       close: 'Close'
       type: 'info'
-      visible: false
       usingModal: false
       domElement: $()
       insertMethod: 'append'
@@ -99,12 +98,12 @@ class Message
 
     # Adiciona o Elemento no DOM
     if @usingModal
-      $(@domElement).on 'hidden', => @visible = false
+      $(@domElement).on 'hidden', => console.log 'modal hidden' # todo: remove message
       $(vtex.Messages.getInstance().modalPlaceholder).append(@domElement)
     else
       $(vtex.Messages.getInstance().placeholder)[@insertMethod](@domElement)
 
-    if @visible then @show()
+    @show()
     return
 
   ###
@@ -118,19 +117,16 @@ class Message
       flagVisibleSet = false
       for modal in $('.modal.' + @classes.MESSAGEINSTANCE)
         modalData = $(modal).data('vtex-message')
-        if modalData.visible is true and modalData.domElement isnt @domElement[0]
+        if modalData.domElement isnt @domElement[0]
           flagVisibleSet = true
           $(modal).one 'hidden', =>
             $(@domElement).modal('show')
-            @visible = true
 
       if not flagVisibleSet
-        $(@domElement).on 'show', => @visible = true
         $(@domElement).modal('show')
 
     if !@usingModal
       @domElement.show()
-      @visible = true
 
       # cria timer da mensagem
       if @.timeout? and @.timeout isnt 0
@@ -151,7 +147,7 @@ class Message
     if !@usingModal
       @domElement.hide()
 
-    @visible = false
+    # todo: remove message
     vtex.Messages.getInstance().changeContainerVisibility()
 
 ###
@@ -184,7 +180,7 @@ class Messages
       _.extend(@, defaultProperties, options)
 
       @buildPlaceholderTemplate()
-      @startEventListeners()
+      @registerEventListeners()
       @bindAjaxError() if @ajaxError
 
     ###
@@ -194,11 +190,12 @@ class Messages
     # @param {Boolean} show caso verdadeiro, após a criação da mensagem, ela será exibida
     # @return {Object} retorna a instancia da Message criada
     ###
-    addMessage: (message, show = false) ->
+    addMessage: (message) ->
       messageObj = new Message(message)
       #@deduplicateMessages(messageObj)
       @messagesArray.push messageObj
-      messageObj.show(message) if show isnt false
+      messageObj.show()
+      # show placeholder if not using modal
       if (!messageObj.usingModal)
         $(vtex.Messages.getInstance().placeholder).show();
 
@@ -235,9 +232,7 @@ class Messages
     changeContainerVisibility: ->
       notModalMessages = _.filter @messagesArray, (message) =>
         message.usingModal is false
-      hasMessages = _.find notModalMessages, (message) =>
-        message.visible is true
-      if !hasMessages
+      if !notModalMessages
         $(vtex.Messages.getInstance().placeholder).hide();
 
     ###
@@ -246,6 +241,7 @@ class Messages
     # @return
     ###
     bindAjaxError: ->
+      console.log 'bindAjaxError'
       $(document).ajaxError (event, xhr, ajaxOptions, thrownError) =>
         return if xhr.status is 401 or xhr.status is 403
         # If refresh in the middle of an AJAX
@@ -301,7 +297,7 @@ class Messages
             html: true
           close: globalClose
 
-        @addMessage(messageObj, true)
+        @addMessage(messageObj)
 
         if addIframeLater
           $('.vtex-error-detail').html(iframe)
@@ -318,14 +314,14 @@ class Messages
 
     ###
     # Inicia a API de eventos
-    # @method startEventListeners
+    # @method registerEventListeners
     # @param
     # @return
     ###
-    startEventListeners: ->
+    registerEventListeners: ->
       if window
-        $(window).on "addMessage.vtex", (evt, message, show) =>
-          @addMessage(message, if show? then show else true)
+        $(window).on "addMessage.vtex", (evt, message) =>
+          @addMessage(message)
         $(window).on "clearMessages.vtex", (evt, usingModal = false) =>
           @removeAllMessages(usingModal)
         $(".vtex-front-messages-close-all").on "click", (evt, usingModal = false) =>
