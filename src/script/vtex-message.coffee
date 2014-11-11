@@ -1,8 +1,8 @@
 root = exports ? window
 window.vtex = window.vtex or {}
 
-###*
-# Classe Message, que representa uma mensagem!
+###
+# Classe Message - representa uma mensagem
 # @class Message
 # @constructor
 ###
@@ -21,7 +21,7 @@ class Message
     defaultProperties =
       id: _.uniqueId('vtex-front-message-')
       template: @classes.TEMPLATE
-      timeout: 0
+      timeout: 30 * 1000
       modalTemplate: @classes.MODALTEMPLATE
       prefixClassForType: @classes.TYPE
       content:
@@ -59,30 +59,29 @@ class Message
 
     if @type is 'fatal' then @usingModal = true
 
+    # Se usa modal
     if @usingModal
-      if not $(vtex.Messages.getInstance().placeholder)[0] then throw new Error("Couldn't find placeholder for modal Message")
-
+      if not $(vtex.Messages.getInstance().modalPlaceholder)[0] then throw new Error("Couldn't find placeholder for Modal Message")
       if @modalTemplate is @classes.MODALTEMPLATE
         @modalTemplate = modalDefaultTemplate
       else
-        if not $(@modalTemplate)[0] then throw new Error("Couldn't find specified template for modal Message")
-
+        if not $(@modalTemplate)[0] then throw new Error("Couldn't find specified template for Modal Message")
       @domElement = $(@modalTemplate)
-    else
-      if not $(vtex.Messages.getInstance().placeholder)[0] then throw new Error("Couldn't find placeholder for Message")
+      $(@domElement).addClass(@id + " " + @classes.MESSAGEINSTANCE + " " + @classes.TYPE + @type)
 
+    # Se não usa modal
+    if !@usingModal
+      if not $(vtex.Messages.getInstance().placeholder)[0] then throw new Error("Couldn't find placeholder for Message")
       if @template is @classes.TEMPLATE
         @template = defaultTemplate
       else
         if not $(@template)[0] then throw new Error("Couldn't find specified template for Message")
-
       @domElement = $(@template).clone(false, false)
-      $(@domElement).bind 'closed', => @visible = false
+      $(@domElement).find(".vtex-front-messages-template").addClass(@id + " " + @classes.MESSAGEINSTANCE + " " + @classes.TYPE + @type)
 
-    #$(@domElement).removeClass(@classes.TEMPLATE)
-    $(@domElement).find(".vtex-front-messages-template").addClass(@id + " " + @classes.MESSAGEINSTANCE + " " + @classes.TYPE + @type)
     $(@domElement).hide()
     $(@domElement).data('vtex-message', @)
+
     if @content.html
       if @content.title and @content.title isnt ''
         $(@classes.TITLE, @domElement).html(@content.title)
@@ -98,6 +97,7 @@ class Message
         $(@classes.SEPARATOR, @domElement).hide()
       $(@classes.DETAIL, @domElement).text(@content.detail)
 
+    # Adiciona o Elemento no DOM
     if @usingModal
       $(@domElement).on 'hidden', => @visible = false
       $(vtex.Messages.getInstance().modalPlaceholder).append(@domElement)
@@ -105,25 +105,18 @@ class Message
       $(vtex.Messages.getInstance().placeholder)[@insertMethod](@domElement)
 
     if @visible then @show()
-
     return
 
-  ###*
+  ###
   # Exibe a mensagem da tela
   # @method show
-  # @param {Object|Number} options será passado como parametro para o método
-  # [fadeIn do jQuery](http://api.jquery.com/fadeIn/). Caso seja Modal, será tratado os
-  # [eventos de modal do Bootstrap](http://twitter.github.io/bootstrap/javascript.html#modals)
   # @return
   ###
-  show: (options) =>
+  show: () =>
     if @usingModal
-      if typeof options is 'object'
-        for eventName in ['show', 'shown', 'hide', 'hidden'] when typeof options[eventName] is 'function'
-          do (eventName) => $(@domElement).on eventName, => options[eventName](@)
-
+      # tratamento para o caso de já haver um modal aberto
       flagVisibleSet = false
-      for modal in $('.modal.'+@classes.MESSAGEINSTANCE)
+      for modal in $('.modal.' + @classes.MESSAGEINSTANCE)
         modalData = $(modal).data('vtex-message')
         if modalData.visible is true and modalData.domElement isnt @domElement[0]
           flagVisibleSet = true
@@ -135,53 +128,30 @@ class Message
         $(@domElement).on 'show', => @visible = true
         $(@domElement).modal('show')
 
-      vtex.Messages.getInstance().changeContainerVisibility()
-      return
-
-    if typeof options is 'object' and options.complete? and typeof options.complete is 'function'
-      userDone = options.complete
-      options.complete = =>
-        @visible = true
-        userDone(@)
-      @domElement.fadeIn(options)
-    else if typeof options is 'number'
-      @domElement.fadeIn(options, => @visible = true)
-    else
+    if !@usingModal
       @domElement.show()
       @visible = true
-      if typeof options is 'object' and options.timeout? and options.timeout isnt 0
+
+      # cria timer da mensagem
+      if @.timeout? and @.timeout isnt 0
         window.setTimeout =>
-          @hide(options)
-        , options.timeout
+          @hide()
+        , @timeout
 
     vtex.Messages.getInstance().changeContainerVisibility()
 
   ###
   # Esconde a mensagem da tela
   # @method hide
-  # @param {Object|Number} options caso preenchido, será passado como parametro para o método
-  #[fadeOut do jQuery](http://api.jquery.com/fadeOut/)
   # @return
   ###
-  hide: (options) =>
+  hide: () =>
     if @usingModal
       @domElement.modal('hide')
-      @visible = false
-      vtex.Messages.getInstance().changeContainerVisibility()
-      return
-
-    if typeof options is 'object' and options.complete? and typeof options.complete is 'function'
-      userDone = options.complete
-      options.complete = =>
-        @visible = false
-        userDone(@)
-      @domElement.fadeOut(options)
-    else if typeof options is 'number'
-      @domElement.fadeOut(options, => @visible = false)
-    else
+    if !@usingModal
       @domElement.hide()
-      @visible = false
 
+    @visible = false
     vtex.Messages.getInstance().changeContainerVisibility()
 
 ###
