@@ -226,26 +226,11 @@ class Messages
     ###
     addMessage: (message, show = false) ->
       messageObj = new Message(message)
-      @deduplicateMessages(messageObj)
+      #@deduplicateMessages(messageObj)
       @messagesArray.push messageObj
       messageObj.show(message) if show isnt false
       if (!messageObj.usingModal)
         $(vtex.Messages.getInstance().placeholder).show();
-
-    ###
-    # Remove uma mensagem
-    # @method removeMessage
-    # @param {Object} messageProperty objeto Message ou objeto com alguma propriedade da mensagem a ser removida
-    # @return
-    ###
-    removeMessage: (messageProperty) ->
-      results = _.where(@messagesArray, messageProperty)
-      for message, i in @messagesArray
-        for res in results
-          if message.id is res.id
-            message.domElement.remove()
-            @messagesArray.splice(i,1)
-            return
 
     ###
     # Esconde mensagens duplicadas
@@ -260,31 +245,16 @@ class Messages
 
     ###
     # Esconde todas as mensagens
-    # @method hideAllMessages
+    # @method removeAllMessages
     # @param {Boolean} usingModal Flag que indica se as mensagems modais também devem ser escondidas
     # @return
     ###
-    hideAllMessages: (usingModal) ->
-      _.each @messagesArray, (message) =>
-        if message.visible
-          if message.usingModal is false || usingModal is true
-            message.domElement.remove()
-            @messagesArray.splice(i,1)
+    removeAllMessages: (usingModal = false) ->
+      _.each @messagesArray, (message, i) =>
+        if (message.usingModal is false) || (usingModal is true)
+          message.domElement.remove()
+          @messagesArray.splice(i,1)
       @.changeContainerVisibility()
-
-    ###
-    # Esconde todas as mensagens
-    # @method hideAllMessages
-    # @param {Boolean} usingModal Flag que indica se as mensagems modais também devem ser escondidas
-    # @return
-    ###
-    removeAllMessages: (usingModal) ->
-      for message, i in @messagesArray
-          if message.usingModal is false || usingModal is true
-            message.domElement.remove()
-            @messagesArray.splice(i,1)
-      @.changeContainerVisibility()
-      return
 
     ###
     # Verifica se o container deve ser escondido, ele será escondido caso não hajam mensagens sendo exibidas
@@ -389,7 +359,7 @@ class Messages
         $(window).on "clearMessages.vtex", (evt, usingModal = false) =>
           @removeAllMessages(usingModal)
         $(".vtex-front-messages-close-all").on "click", (evt, usingModal = false) =>
-          @hideAllMessages(usingModal)
+          @removeAllMessages(usingModal)
 
     ###
     # Get cookie

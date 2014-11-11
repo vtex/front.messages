@@ -23,6 +23,7 @@ module.exports = function(config) {
 		frameworks: ['jasmine'],
 		browsers: [ 'PhantomJS'],
 		port: 9876,
+		autoWatch: false,
 		files: [
 			'build/front-messages-ui/lib/bower_components/jquery/jquery.js',
 			'build/front-messages-ui/lib/bower_components/underscore/underscore.js',

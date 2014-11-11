@@ -64,7 +64,7 @@ module.exports = (grunt) ->
     min: ['uglify'] # minifies files
   # Deploy tasks
     dist: ['build', 'min', 'cssmin'] # Dist - minifies files
-    test: ['dev', 'connect', 'karma:unit', 'watch:test']
+    test: ['dev', 'karma:unit', 'watch:test']
     vtex_deploy: ['shell:cp', 'shell:cp_br']
   # Development tasks
     default: ['build', 'connect', 'watch']

@@ -1,7 +1,7 @@
 jasmine.getFixtures().fixturesPath = "base/build/front-messages-ui/spec/fixtures"
 jasmine.getJSONFixtures().fixturesPath = "base/build/front-messages-ui/spec/fixtures"
 
-console.log 'Test started -->'
+console.log 'Test started ->'
 
 describe "Messages", ->
 
@@ -15,7 +15,7 @@ describe "Messages", ->
   it "should create Messages obj", ->
     # Arrange
     # Act
-    messages = new window.vtex.Messages.getInstance({ajaxError:true})
+    messages = new window.vtex.Messages.getInstance()
 
     # Assert
     expect(messages).toBeDefined()
@@ -24,8 +24,8 @@ describe "Messages", ->
     messages = undefined
 
     beforeEach ->
-      messages = new window.vtex.Messages.getInstance({ajaxError:true})
-      $(window).trigger("clearMessages.vtex", true)
+      messages = new window.vtex.Messages.getInstance()
+      $(window).trigger("clearMessages.vtex", [true])
 
     it "should add a Message object to messagesArray", ->
       # Arrange
@@ -85,89 +85,65 @@ describe "Messages", ->
       # Assert
       expect($(">", ".vtex-front-messages-placeholder").length).toBe(2)
 
-    it "should show as modal when type is fatal", ->
+    it "should show as modal when message type is fatal", ->
       # Arrange
-      opts =
+      message =
+        content:
+          title: "Sucesso - Mensagem de teste no modal"
+          detail: "Mensagem de teste do tipo success"
         type: "fatal"
         usingModal: false
 
       # Act
-      message = messages.addMessage(opts)
+      $(window).trigger("addMessage.vtex", [message, true])
 
       # Assert
-      expect(message.usingModal).toBe(true)
+      expect($(".vtex-front-messages-template-modal-default", "body")).toExist()
 
-    it "should show message when adding with visible true", ->
+    it "should show message when adding with the visible true", ->
       # Arrange
+      # Arrange
+      message =
+        content:
+          title: ''
+          detail: 'foo'
+        visible: true
 
       # Act
-      message = messages.addMessage({visible: true})
+      $(window).trigger("addMessage.vtex", [message, true]);
 
       # Assert
-      expect(message.visible).toBe(true)
-      expect($(message.domElement,message.placeholder)).toBeVisible()
-
-    it "should call event functions when it is a modal message", ->
-      # Arrange
-      opts = { type: "fatal" }
-
-      shownFn = jasmine.createSpy("shownFn")
-      showOptions = { shown: shownFn }
-
-      $.support.transition = false
-
-      # Act
-      message = messages.addMessage(opts, showOptions)
-
-      # Assert
-      expect(showOptions.shown).toHaveBeenCalled()
-      expect(showOptions.shown.mostRecentCall.args[0]).toEqual(message)
-      expect(message.visible).toBe(true)
+      expect($('.vtex-front-messages-template', '.vtex-front-messages-placeholder')).toBeVisible()
 
     it 'should hide the title if it is and empty string', ->
       # Arrange
-      opts =
+      message =
         content:
           title: ''
           detail: 'foo'
 
       # Act
-      message = messages.addMessage(opts, true)
+      $(window).trigger("addMessage.vtex", [message, true]);
 
       # Assert
-      expect($(message.classes.TITLE, message.domElement)).not.toBeVisible()
-      expect($(message.classes.DETAIL, message.domElement)).toBeVisible()
+      expect($('.vtex-front-messages-title','.vtex-front-messages-template')).not.toBeVisible()
+      expect($('.vtex-front-messages-detail', '.vtex-front-messages-template')).toBeVisible()
 
-    it 'should show the message contents inside the elements specified', ->
+    it 'should show the message contents', ->
       # Arrange
-      opts =
+      message =
         content:
           title: 'foo'
           detail: 'bar'
 
       # Act
-      message = messages.addMessage(opts, true)
+      $(window).trigger("addMessage.vtex", [message, true]);
 
       # Assert
-      expect($(message.classes.TITLE, message.domElement)).toBeVisible()
-      expect($(message.classes.DETAIL, message.domElement)).toBeVisible()
-      expect($(message.classes.TITLE, message.domElement).html()).toMatch('foo')
-      expect($(message.classes.DETAIL, message.domElement).html()).toMatch('bar')
-
-    it 'should show button close label', ->
-      # Arrange
-      opts =
-        content:
-          title: 'foo'
-          detail: 'bar'
-        type: 'fatal'
-        close: 'pop'
-
-      # Act
-      message = messages.addMessage(opts, true)
-
-      # Assert
-      expect($('.btn', message.domElement).html()).toMatch('pop')
+      expect($('.vtex-front-messages-title', '.vtex-front-messages-template')).toBeVisible()
+      expect($('.vtex-front-messages-detail', '.vtex-front-messages-template')).toBeVisible()
+      expect($('.vtex-front-messages-title', '.vtex-front-messages-template').html()).toMatch('foo')
+      expect($('.vtex-front-messages-detail', '.vtex-front-messages-template').html()).toMatch('bar')
 
   describe "AJAX", ->
 
