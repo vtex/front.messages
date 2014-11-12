@@ -217,7 +217,8 @@ class Messages
     # @return
     ###
     removeAllMessages: (usingModal = false) ->
-      _.each @messagesArray, (message, i) =>
+      for i in [@messagesArray.length - 1..0] by -1
+        message = @messagesArray[i]
         if (message.usingModal is false) || (usingModal is true)
           message.domElement.remove()
           @messagesArray.splice(i,1)
