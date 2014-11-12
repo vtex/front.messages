@@ -232,7 +232,7 @@ class Messages
     changeContainerVisibility: ->
       notModalMessages = _.filter @messagesArray, (message) =>
         message.usingModal is false
-      if !notModalMessages
+      if notModalMessages.length is 0
         $(vtex.Messages.getInstance().placeholder).hide();
 
     ###
