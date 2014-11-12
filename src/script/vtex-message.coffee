@@ -98,7 +98,8 @@ class Message
 
     # Adiciona o Elemento no DOM
     if @usingModal
-      $(@domElement).on 'hidden', => console.log 'modal hidden' # todo: remove message
+      $(@domElement).on 'hidden', =>
+        $(window).trigger('removeMessage.vtex', @)
       $(vtex.Messages.getInstance().modalPlaceholder).append(@domElement)
     else
       $(vtex.Messages.getInstance().placeholder)[@insertMethod](@domElement)
