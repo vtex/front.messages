@@ -10,7 +10,7 @@ class Message
   constructor: (options = {}) ->
     @classes =
       TEMPLATEDEFAULT: '.vtex-front-messages-template.vtex-front-messages-template-default'
-      MODALTEMPLATEDEFAULT: '.vtex-front-messages-template.vtex-front-messages-template-modal-default'
+      MODALTEMPLATEDEFAULT: '.vtex-front-messages-modal-template.vtex-front-messages-modal-template-default'
       TEMPLATE: '.vtex-front-messages-container'
       TITLE: '.vtex-front-messages-title'
       SEPARATOR: '.vtex-front-messages-separator'
@@ -35,7 +35,7 @@ class Message
     _.extend(@, defaultProperties, options)
 
     modalDefaultTemplate = """
-    <div class="vtex-front-messages-template vtex-front-messages-template-modal-default modal hide fade">
+    <div class="vtex-front-messages-modal-template vtex-front-messages-modal-template-default modal hide fade">
       <div class="modal-header">
         <h3 class="vtex-front-messages-title"></h3>
       </div>
