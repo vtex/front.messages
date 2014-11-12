@@ -117,7 +117,7 @@ class Message
       flagVisibleSet = false
       for modal in $('.modal.' + @classes.MESSAGEINSTANCE)
         modalData = $(modal).data('vtex-message')
-        if modalData.domElement isnt @domElement[0]
+        if modalData.domElement[0] isnt @domElement[0]
           flagVisibleSet = true
           $(modal).one 'hidden', =>
             $(@domElement).modal('show')
@@ -127,14 +127,11 @@ class Message
 
     if !@usingModal
       @domElement.show()
-
-      # cria timer da mensagem
+      # se necessário, cria timer para a mensagem
       if @.timeout? and @.timeout isnt 0
         window.setTimeout =>
           @hide()
         , @timeout
-
-    vtex.Messages.getInstance().changeContainerVisibility()
 
   ###
   # Esconde a mensagem da tela
@@ -146,9 +143,7 @@ class Message
       @domElement.modal('hide')
     if !@usingModal
       @domElement.hide()
-
-    # todo: remove message
-    vtex.Messages.getInstance().changeContainerVisibility()
+    $(window).trigger('removeMessage.vtex', @)
 
 ###
 # Classe Messages, que agrupa todas as mensagens
@@ -184,11 +179,10 @@ class Messages
       @bindAjaxError() if @ajaxError
 
     ###
-    # Adiciona uma mensagem ao objeto Messages, exibe na tela imediatamente caso passado param show como true
+    # Adiciona uma mensagem
     # @method addMessage
-    # @param {Object} message
-    # @param {Boolean} show caso verdadeiro, após a criação da mensagem, ela será exibida
-    # @return {Object} retorna a instancia da Message criada
+    # @param {Object} Message
+    # @return
     ###
     addMessage: (message) ->
       messageObj = new Message(message)
@@ -198,6 +192,20 @@ class Messages
       # show placeholder if not using modal
       if (!messageObj.usingModal)
         $(vtex.Messages.getInstance().placeholder).show();
+
+    ###
+    # Remove uma mensagem
+    # @method removeMessage
+    # @param {Object} Message
+    # @return
+    ###
+    removeMessage: (message) =>
+      for i in [@messagesArray.length - 1..0] by -1
+        currentMessage = @messagesArray[i]
+        if (currentMessage.id is message.id)
+          currentMessage.domElement.remove()
+          @messagesArray.splice(i,1)
+      @.changeContainerVisibility()
 
     ###
     # Esconde mensagens duplicadas
@@ -325,6 +333,8 @@ class Messages
           @addMessage(message)
         $(window).on "clearMessages.vtex", (evt, usingModal = false) =>
           @removeAllMessages(usingModal)
+        $(window).on "removeMessage.vtex", (evt, message = {}) =>
+          @removeMessage(message)
         $(".vtex-front-messages-close-all").on "click", (evt, usingModal = false) =>
           @removeAllMessages(usingModal)
 
