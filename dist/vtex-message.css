@@ -9,49 +9,44 @@
   -moz-box-shadow: 1px 1px 10px 1px #ccc;
   box-shadow: 1px 1px 10px 1px #ccc;
   display: none;
-  .vtex-front-messages-close-all{
-    position: absolute;
-    top: 8px;
-    right: 5px;
-    z-index: 2;
-    -webkit-transition: 0.2s ease-in-out;
-    -moz-transition: 0.2s ease-in-out;
-    -o-transition: 0.2s ease-in-out;
-    transition: 0.2s ease-in-out;
-    &:hover {
-      -webkit-transform: rotate(90deg);
-      -moz-transform: translate(90deg);
-      -o-transform: translate(90deg);
-      -ms-transform: translate(90deg);
-      transform: translate(90deg);
-    }
-  }
 }
-
+.vtex-front-messages-placeholder .vtex-front-messages-close-all {
+  position: absolute;
+  top: 8px;
+  right: 5px;
+  z-index: 2;
+  -webkit-transition: 0.2s ease-in-out;
+  -moz-transition: 0.2s ease-in-out;
+  -o-transition: 0.2s ease-in-out;
+  transition: 0.2s ease-in-out;
+}
+.vtex-front-messages-placeholder .vtex-front-messages-close-all:hover {
+  -webkit-transform: rotate(90deg);
+  -moz-transform: translate(90deg);
+  -o-transform: translate(90deg);
+  -ms-transform: translate(90deg);
+  transform: translate(90deg);
+}
 .vtex-front-messages-template {
   padding: 8px 20px 8px 15px;
   color: #777;
   border-left: 3px solid #eea236;
-  &:last-of-type {
-    padding-bottom: 12px;
-  }
-  &:first-of-type {
-    padding-top: 14px;
-  }
 }
-
+.vtex-front-messages-template:last-of-type {
+  padding-bottom: 12px;
+}
+.vtex-front-messages-template:first-of-type {
+  padding-top: 14px;
+}
 .vtex-front-messages-type-success {
   border-color: #4cae4c;
 }
-
 .vtex-front-messages-type-info {
   border-color: #46b8da;
 }
-
 .vtex-front-messages-type-warning {
   border-color: #eea236;
 }
-
 .vtex-front-messages-type-danger,
 .vtex-front-messages-type-fatal,
 .vtex-front-messages-type-error {

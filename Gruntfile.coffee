@@ -44,6 +44,13 @@ module.exports = (grunt) ->
     src: ['**', '!**/*.coffee']
     dest: 'build/<%= relativePath %>/spec/'
 
+  config.copy.dist =
+    expand: true
+    cwd: 'build//front-messages-ui/'
+    src: ['script/vtex-message.js', 'style/vtex-message.css']
+    flatten: true
+    dest: 'dist/'
+
   config.karma =
     options:
       configFile: 'karma.conf.js'
@@ -63,7 +70,7 @@ module.exports = (grunt) ->
     dev: ['clean', 'copy:main', 'copy:pkg', 'copy:test', 'coffee', 'less']
     min: ['uglify'] # minifies files
   # Deploy tasks
-    dist: ['build', 'min', 'cssmin'] # Dist - minifies files
+    dist: ['build', 'min', 'cssmin', 'copy:dist'] # Dist - minifies files
     test: ['dev', 'karma:unit', 'watch:test']
     vtex_deploy: ['shell:cp', 'shell:cp_br']
   # Development tasks
