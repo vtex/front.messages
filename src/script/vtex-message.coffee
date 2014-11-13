@@ -28,7 +28,8 @@ class Message
         title: ''
         detail: ''
       close: 'Close'
-      type: 'info'
+      type: 'info' # possible types are: ['success', 'info', 'warning', 'danger', 'fatal', 'error']
+      visible: true
       usingModal: false
       domElement: $()
       insertMethod: 'append'
@@ -99,6 +100,7 @@ class Message
     # Adiciona o Elemento no DOM
     if @usingModal
       $(@domElement).on 'hidden', =>
+        @visible = false
         $(window).trigger('removeMessage.vtex', @)
       $(vtex.Messages.getInstance().modalPlaceholder).append(@domElement)
     else
@@ -118,16 +120,19 @@ class Message
       flagVisibleSet = false
       for modal in $('.modal.' + @classes.MESSAGEINSTANCE)
         modalData = $(modal).data('vtex-message')
-        if modalData.domElement[0] isnt @domElement[0]
+        if (modalData.domElement[0] isnt @domElement[0]) and (modalData.visible is true)
           flagVisibleSet = true
           $(modal).one 'hidden', =>
             $(@domElement).modal('show')
+            @visible = true
 
       if not flagVisibleSet
+        $(@domElement).on 'show', => @visible = true
         $(@domElement).modal('show')
 
     if !@usingModal
       @domElement.show()
+      @visible = true
       # se necessário, cria timer para a mensagem
       if @.timeout? and @.timeout isnt 0
         window.setTimeout =>
@@ -144,6 +149,7 @@ class Message
       @domElement.modal('hide')
     if !@usingModal
       @domElement.hide()
+      @visible = false
     $(window).trigger('removeMessage.vtex', @)
 
 ###
@@ -204,8 +210,9 @@ class Messages
       for i in [@messagesArray.length - 1..0] by -1
         currentMessage = @messagesArray[i]
         if (currentMessage.id is message.id)
-          currentMessage.domElement.remove()
           @messagesArray.splice(i,1)
+          if !message.usingModal
+            currentMessage.domElement.remove()
       @.changeContainerVisibility()
 
     ###
