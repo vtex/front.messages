@@ -11,7 +11,7 @@ class Message
     @classes =
       TEMPLATEDEFAULT: '.vtex-front-messages-template.vtex-front-messages-template-default'
       MODALTEMPLATEDEFAULT: '.vtex-front-messages-modal-template.vtex-front-messages-modal-template-default'
-      TEMPLATE: '.vtex-front-messages-container'
+      TEMPLATE: '.vtex-front-messages-template'
       TITLE: '.vtex-front-messages-title'
       SEPARATOR: '.vtex-front-messages-separator'
       DETAIL: '.vtex-front-messages-detail'
@@ -50,10 +50,8 @@ class Message
     """
 
     defaultTemplate = """
-    <div class="vtex-front-messages-container">
-    <div class="vtex-front-messages-template vtex-front-messages-template-default static-front-messages-template">
+    <div class="vtex-front-messages-template">
       <span class="vtex-front-messages-title"></span><span class="vtex-front-messages-separator"> - </span><span 						class="vtex-front-messages-detail"></span>
-    </div>
     </div>
     """
 
@@ -77,7 +75,7 @@ class Message
       else
         if not $(@template)[0] then throw new Error("Couldn't find specified template for Message")
       @domElement = $(@template).clone(false, false)
-      $(@domElement).find(".vtex-front-messages-template").addClass(@id + " " + @classes.MESSAGEINSTANCE + " " + @classes.TYPE + @type)
+      $(@domElement).addClass(@id + " " + @classes.MESSAGEINSTANCE + " " + @classes.TYPE + @type)
 
     $(@domElement).hide()
     $(@domElement).data('vtex-message', @)
