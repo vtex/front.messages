@@ -342,7 +342,6 @@
 
       VtexMessages.prototype.bindAjaxError = function() {
         var _this = this;
-        console.log('bindAjaxError');
         return $(document).ajaxError(function(event, xhr, ajaxOptions, thrownError) {
           var addIframeLater, errorMessage, globalClose, globalError, globalUnknownError, iframe, isContentJson, messageObj, showFullError, _ref, _ref1;
           if (xhr.status === 401 || xhr.status === 403) {
@@ -351,15 +350,9 @@
           if (xhr.readyState === 0 || xhr.status === 0) {
             return;
           }
-          if (window.i18n) {
-            globalUnknownError = window.i18n.t('global.unkownError');
-            globalError = window.i18n.t('global.error');
-            globalClose = window.i18n.t('global.close');
-          } else {
-            globalUnknownError = "An unexpected error ocurred.";
-            globalError = "Error";
-            globalClose = "Close";
-          }
+          globalUnknownError = window.i18n ? window.i18n.t('global.unkownError') : 'An unexpected error ocurred.';
+          globalError = window.i18n ? window.i18n.t('global.error') : 'Error';
+          globalClose = window.i18n ? window.i18n.t('global.close') : 'Close';
           if (xhr.getResponseHeader('x-vtex-operation-id')) {
             globalError += ' <small class="vtex-operation-id-container">(Operation ID ';
             globalError += '<span class="vtex-operation-id">';

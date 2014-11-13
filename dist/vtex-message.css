@@ -9,6 +9,7 @@
   -moz-box-shadow: 1px 1px 10px 1px #ccc;
   box-shadow: 1px 1px 10px 1px #ccc;
   display: none;
+  z-index: 99999;
 }
 .vtex-front-messages-placeholder .vtex-front-messages-close-all {
   position: absolute;

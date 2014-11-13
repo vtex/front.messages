@@ -256,21 +256,14 @@ class Messages
     # @return
     ###
     bindAjaxError: ->
-      console.log 'bindAjaxError'
       $(document).ajaxError (event, xhr, ajaxOptions, thrownError) =>
         return if xhr.status is 401 or xhr.status is 403
         # If refresh in the middle of an AJAX
         if xhr.readyState is 0 or xhr.status is 0 then return
 
-        if window.i18n
-          globalUnknownError = window.i18n.t('global.unkownError')
-          globalError = window.i18n.t('global.error')
-          globalClose = window.i18n.t('global.close')
-        else
-          globalUnknownError = "An unexpected error ocurred."
-          globalError = "Error"
-          globalClose = "Close"
-
+        globalUnknownError = if window.i18n then window.i18n.t('global.unkownError') else 'An unexpected error ocurred.'
+        globalError = if window.i18n then window.i18n.t('global.error') else 'Error'
+        globalClose = if window.i18n then window.i18n.t('global.close') else 'Close'
 
         if xhr.getResponseHeader('x-vtex-operation-id')
           globalError += ' <small class="vtex-operation-id-container">(Operation ID '
