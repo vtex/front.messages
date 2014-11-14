@@ -1,11 +1,11 @@
 $ ->
   window.messages = new window.vtex.Messages.getInstance({ajaxError:true})
 
-  modalMessage =
-    content:
-      title: 'Erro 1!'
-      detail: 'Ocorreu um erro inesperado nos nossos servidores.'
-    type: 'fatal'
+#  modalMessage =
+#    content:
+#      title: 'Erro 1!'
+#      detail: 'Ocorreu um erro inesperado nos nossos servidores.'
+#    type: 'fatal'
 
   errorMessage =
     content:
@@ -24,6 +24,7 @@ $ ->
       title: 'Success'
       detail: 'Ocorreu um erro inesperado nos nossos servidores.'
     type: 'success'
+    timeout: 0
 
   infoMessage =
     content:
