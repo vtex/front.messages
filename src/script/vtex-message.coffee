@@ -99,7 +99,7 @@ class Message
     if @usingModal
       $(@domElement).on 'hidden', =>
         @visible = false
-        $(window).trigger('removeMessage.vtex', @)
+        $(window).trigger('removeMessage.vtex', @.id)
       $(vtex.Messages.getInstance().modalPlaceholder).append(@domElement)
     else
       $(vtex.Messages.getInstance().placeholder)[@insertMethod](@domElement)
@@ -148,7 +148,7 @@ class Message
     if !@usingModal
       @domElement.hide()
       @visible = false
-    $(window).trigger('removeMessage.vtex', @)
+    $(window).trigger('removeMessage.vtex', @.id)
 
 ###
 # Classe Messages, que agrupa todas as mensagens
@@ -191,7 +191,7 @@ class Messages
     ###
     addMessage: (message) ->
       messageObj = new Message(message)
-      #@deduplicateMessages(messageObj)
+      @deduplicateMessages(messageObj)
       @messagesArray.push messageObj
       messageObj.show()
       # show placeholder if not using modal
@@ -201,16 +201,18 @@ class Messages
     ###
     # Remove uma mensagem
     # @method removeMessage
-    # @param {Object} Message
+    # @param {String} messageId
     # @return
     ###
-    removeMessage: (message) =>
+    removeMessage: (messageId) =>
       for i in [@messagesArray.length - 1..0] by -1
         currentMessage = @messagesArray[i]
-        if (currentMessage.id is message.id)
+        if (currentMessage.id is messageId)
           @messagesArray.splice(i,1)
-          if !message.usingModal
+          if !currentMessage.usingModal
             currentMessage.domElement.remove()
+          else
+            currentMessage.domElement.modal('hide')
       @.changeContainerVisibility()
 
     ###
@@ -332,8 +334,8 @@ class Messages
           @addMessage(message)
         $(window).on "clearMessages.vtex", (evt, usingModal = false) =>
           @removeAllMessages(usingModal)
-        $(window).on "removeMessage.vtex", (evt, message = {}) =>
-          @removeMessage(message)
+        $(window).on "removeMessage.vtex", (evt, messageId) =>
+          @removeMessage(messageId)
         $(".vtex-front-messages-close-all").on "click", (evt, usingModal = false) =>
           @removeAllMessages(usingModal)
 

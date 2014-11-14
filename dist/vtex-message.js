@@ -105,7 +105,7 @@
       if (this.usingModal) {
         $(this.domElement).on('hidden', function() {
           _this.visible = false;
-          return $(window).trigger('removeMessage.vtex', _this);
+          return $(window).trigger('removeMessage.vtex', _this.id);
         });
         $(vtex.Messages.getInstance().modalPlaceholder).append(this.domElement);
       } else {
@@ -172,7 +172,7 @@
         this.domElement.hide();
         this.visible = false;
       }
-      return $(window).trigger('removeMessage.vtex', this);
+      return $(window).trigger('removeMessage.vtex', this.id);
     };
 
     return Message;
@@ -245,6 +245,7 @@
       VtexMessages.prototype.addMessage = function(message) {
         var messageObj;
         messageObj = new Message(message);
+        this.deduplicateMessages(messageObj);
         this.messagesArray.push(messageObj);
         messageObj.show();
         if (!messageObj.usingModal) {
@@ -255,19 +256,21 @@
       /*
       # Remove uma mensagem
       # @method removeMessage
-      # @param {Object} Message
+      # @param {String} messageId
       # @return
       */
 
 
-      VtexMessages.prototype.removeMessage = function(message) {
+      VtexMessages.prototype.removeMessage = function(messageId) {
         var currentMessage, i, _i, _ref;
         for (i = _i = _ref = this.messagesArray.length - 1; _i >= 0; i = _i += -1) {
           currentMessage = this.messagesArray[i];
-          if (currentMessage.id === message.id) {
+          if (currentMessage.id === messageId) {
             this.messagesArray.splice(i, 1);
-            if (!message.usingModal) {
+            if (!currentMessage.usingModal) {
               currentMessage.domElement.remove();
+            } else {
+              currentMessage.domElement.modal('hide');
             }
           }
         }
@@ -428,11 +431,8 @@
             }
             return _this.removeAllMessages(usingModal);
           });
-          $(window).on("removeMessage.vtex", function(evt, message) {
-            if (message == null) {
-              message = {};
-            }
-            return _this.removeMessage(message);
+          $(window).on("removeMessage.vtex", function(evt, messageId) {
+            return _this.removeMessage(messageId);
           });
           return $(".vtex-front-messages-close-all").on("click", function(evt, usingModal) {
             if (usingModal == null) {
