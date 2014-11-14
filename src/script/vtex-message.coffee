@@ -33,7 +33,9 @@ class Message
       usingModal: false
       domElement: $()
       insertMethod: 'append'
+
     _.extend(@, defaultProperties, options)
+    @.timeout = @setTimeoutDefaults(options)
 
     modalDefaultTemplate = """
     <div class="vtex-front-messages-modal-template vtex-front-messages-modal-template-default modal hide fade">
@@ -106,6 +108,19 @@ class Message
 
     @show()
     return
+
+  setTimeoutDefaults: (options) ->
+    if options.timeout
+      timeout = options.timeout
+    else
+      switch @.type
+        when 'success' then timeout = 10 * 1000
+        when 'info' then timeout = 15 * 1000
+        when 'warning' then timeout = 20 * 1000
+        when 'error' then timeout = 25 * 1000
+        when 'danger' then timeout = 30 * 1000
+        else timeout = 30 * 1000
+    return timeout
 
   ###
   # Exibe a mensagem da tela

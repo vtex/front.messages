@@ -9,7 +9,7 @@
   -moz-box-shadow: 1px 1px 10px 1px #ccc;
   box-shadow: 1px 1px 10px 1px #ccc;
   display: none;
-  z-index: 99999;
+  z-index: 1040;
 }
 .vtex-front-messages-placeholder .vtex-front-messages-close-all {
   position: absolute;
@@ -39,17 +39,17 @@
 .vtex-front-messages-template:first-of-type {
   padding-top: 14px;
 }
-.vtex-front-messages-template .vtex-front-messages-type-success {
+.vtex-front-messages-template.vtex-front-messages-type-success {
   border-color: #4cae4c;
 }
-.vtex-front-messages-template .vtex-front-messages-type-info {
+.vtex-front-messages-template.vtex-front-messages-type-info {
   border-color: #46b8da;
 }
-.vtex-front-messages-template .vtex-front-messages-type-warning {
+.vtex-front-messages-template.vtex-front-messages-type-warning {
   border-color: #eea236;
 }
-.vtex-front-messages-template .vtex-front-messages-type-danger,
-.vtex-front-messages-template .vtex-front-messages-type-fatal,
-.vtex-front-messages-template .vtex-front-messages-type-error {
+.vtex-front-messages-template.vtex-front-messages-type-danger,
+.vtex-front-messages-template.vtex-front-messages-type-fatal,
+.vtex-front-messages-template.vtex-front-messages-type-error {
   border-color: #d43f3a;
 }

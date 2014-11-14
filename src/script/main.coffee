@@ -9,34 +9,29 @@ $ ->
 
   errorMessage =
     content:
-      title: 'Erro 2'
+      title: 'Error'
       detail: 'Ocorreu um erro inesperado nos nossos servidores.'
     type: 'error'
-    timeout: 0
 
   warningMessage =
     content:
-      title: 'Erro 2'
+      title: 'Warning'
       detail: 'Ocorreu um erro inesperado nos nossos servidores.'
     type: 'warning'
-    timeout: 0
 
   successMessage =
     content:
-      title: 'Erro 2'
+      title: 'Success'
       detail: 'Ocorreu um erro inesperado nos nossos servidores.'
     type: 'success'
-    timeout: 30 * 1000
 
   infoMessage =
     content:
-      title: 'Erro 2'
+      title: 'Info'
       detail: 'Ocorreu um erro inesperado nos nossos servidores.'
     type: 'info'
-    timeout: 15 * 1000
 
-
-  $(window).trigger('addMessage', modalMessage);
+  #$(window).trigger('addMessage', modalMessage);
   $(window).trigger('addMessage', errorMessage);
   $(window).trigger('addMessage', warningMessage);
   $(window).trigger('addMessage', successMessage);
