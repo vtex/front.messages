@@ -109,11 +109,11 @@ class Message
     @show()
     return
 
-   ###
-   # Configura o timeout da mensagem de acordo com o 'type' da mesma
-   # @method setTimeoutDefaults
-   # @return
-   ###
+  ###
+  # Configura o timeout da mensagem de acordo com o 'type' da mesma
+  # @method setTimeoutDefaults
+  # @return
+  ###
   setTimeoutDefaults: (options) ->
     ONE_SECOND = 1000
     if options.timeout?
