@@ -34,8 +34,8 @@
       };
       defaultProperties = {
         id: _.uniqueId('vtex-front-message-'),
-        template: this.classes.TEMPLATE,
         timeout: 30 * 1000,
+        template: this.classes.TEMPLATE,
         modalTemplate: this.classes.MODALTEMPLATE,
         prefixClassForType: this.classes.TYPE,
         content: {
