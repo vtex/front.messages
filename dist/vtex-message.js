@@ -462,14 +462,14 @@
           $(window).on("addMessage.vtex", function(evt, message) {
             return _this.addMessage(message);
           });
-          $(window).on("clearMessages.vtex", function(evt, usingModal) {
+          $(window).on("removeMessage.vtex", function(evt, messageId) {
+            return _this.removeMessage(messageId);
+          });
+          $(window).on("removeAllMessages.vtex", function(evt, usingModal) {
             if (usingModal == null) {
               usingModal = false;
             }
             return _this.removeAllMessages(usingModal);
-          });
-          $(window).on("removeMessage.vtex", function(evt, messageId) {
-            return _this.removeMessage(messageId);
           });
           return $(".vtex-front-messages-close-all").on("click", function(evt, usingModal) {
             if (usingModal == null) {
