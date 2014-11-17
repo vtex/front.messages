@@ -1,19 +1,19 @@
 # front.Messages
 
-
 Exemplo de uso:
 ```javascript
 $(document).ready(function(){
-	var messsages, messageObj, message;
-	messages = new window.vtex.Messages({ajaxError:true});
+	var messsages, message;
+	messages = new window.vtex.Messages.getInstance({ajaxError:true});
 
-	messageObj = {
+	message = {
 		content: 
-			title: 'Erro 1!',
+			title: 'Erro!',
 			detail: 'Ocorreu um erro inesperado em nos nossos servidores.'
-		type: 'fatal'
+		type: 'error'
 	};
-	message1 = messages.addMessage(message, true);	
+	
+	$(window).trigger('addMessage', message);	
 });
 ```
 ====
@@ -32,8 +32,8 @@ Você poderá vê-lo em ação em `http://localhost:9001/`.
 
 ### Messages
 
-<h4 id="Messages()"><code>window.vtex.Messages(customOptions)</code></h4>
-<p>Retorna uma instância de Messages.</p>
+<h4 id="Messages()"><code>window.vtex.Messages.getInstance(customOptions)</code></h4>
+<p>Retorna a instância de Messages.</p>
 <table class="table table-bordered table-striped">
 	<thead>
 		<tr>
@@ -47,16 +47,13 @@ Você poderá vê-lo em ação em `http://localhost:9001/`.
 		<tr>
 			<td>customOptions</td>
 			<td>object</td>
-			<td>{ajaxError:true}</td>
+			<td>{ajaxError:true, placeholder: '.message-placeholder', modalPlaceholder: '.modal-placeholder'}</td>
 			<td>Passada a opção ajaxError como true, o plugin handle requests AJAX com erro, exibindo um modal de erro com as suas devidas mensagens de erro.</td>
 		</tr>
 	</tbody>
 </table>
 
-<h4 id="messagesArray"><code>.messagesArray</code></h4>
-<p>Array onde é guardado todas as mensagens.</p>
-
-<h4 id="addMessage()"><code>.addMessage(message, visible)</code></h4>
+<h4 id="addMessage()"><code>$(window).trigger('addMessage', message, [messageId])</code></h4>
 <p>Adiciona uma mensagem nova ao objeto de Messages.</p>
 <table class="table table-bordered table-striped">
 	<thead>
@@ -75,10 +72,11 @@ Você poderá vê-lo em ação em `http://localhost:9001/`.
 			<td>Objeto do tipo message descrito abaixo.</td>
 		</tr>
 		<tr>
-			<td>visible</td>
-			<td>boolean</td>
-			<td><code>true</code></td>
-			<td>Caso seja true a mensagem é exibida após a criação. Pode ser passado como param um objeto do tipo <a href="http://api.jquery.com/fadeIn/">fadeIn do jQUery</a></td>
+			<td>messageId</td>
+			<td>String</td>
+			<td><code>'Payment-Unauthorized'</code></td>
+			<td>Parâmetro opcional, é um identificador para a mensagem, útil para o caso de ser necessário remover essa 
+			mensagem no futuro, programaticamente</td>
 		</tr>
 	</tbody>
 </table>
@@ -89,15 +87,14 @@ Você poderá vê-lo em ação em `http://localhost:9001/`.
 // Modelo de Message
 {
 	id: 'id unico da Message',
-	placeholder: 'seletor CSS do local onde será inserido a Message',
-	modalPlaceholder: 'seletor CSS do local onde será inserido o Modal',
+  timeout: 'tempo que a mesagem será exibida, em milisegundos'
 	template: 'seletor CSS do template da message',
 	modalTemplate: 'seletor CSS do template da modal message',
 	prefixClassForType: 'prefixo da classe a ser concatenada com o type'
 	content:
 		title: 'título da message',
-		detail: 'mensagem da message'
-	type: 'tipo da message (caso seja "fatal", sera exibida como modal)',
+		detail: 'detalhe da message'
+	type: 'tipo da message (caso seja "fatal", sera exibida como modal, tipos disponíveis são ["success", "info", "warning", "danger", "fatal", "error"])',
 	visible: 'caso true a message sera exibida apos ser adicionada',
 	usingModal: 'caso seja true sera exibida como modal',
 	domElement: 'propriedade que será preenchida com o elemento do DOM da message',
@@ -106,25 +103,23 @@ Você poderá vê-lo em ação em `http://localhost:9001/`.
 
 // Default
 {
-	id: _.uniqueId('vtex-message-')
-	placeholder: '.vtex-message-placeholder'
-	modalPlaceholder: 'body'
-	template: '.vtex-message-template.vtex-message-template-default'
-	modalTemplate: '.vtex-message-template.vtex-message-template-modal-default'
-	prefixClassForType: 'alert-'
+	id: _.uniqueId('vtex-front-message-')
+	template: '.vtex-front-messages-template'
+	modalTemplate: '.vtex-front-messages-modal-template.vtex-front-messages-modal-template-default'
+	prefixClassForType: 'vtex-front-messages-type-'
 	content:
 		title: ''
 		detail: ''
 	type: 'info'
-	visible: false
+	visible: true
 	usingModal: false
 	domElement: $()
 	insertMethod: 'append'
 }
 ```
 
-<h4 id="show()"><code>.show(showOptions)</code></h4>
-<p>Exibe a mensagem.</p>
+<h4 id="removeMessage()"><code>$(window).trigger('removeMessage', messageId)</code></h4>
+<p>Remove a mensagem com o id igual ao solicitado.</p>
 <table class="table table-bordered table-striped">
 	<thead>
 		<tr>
@@ -136,16 +131,16 @@ Você poderá vê-lo em ação em `http://localhost:9001/`.
 	</thead>
 	<tbody>
 		<tr>
-			<td>showOptions</td>
-			<td>object</td>
-			<td>{duration:500, complete: function(message){console.log(message);}}</td>
-			<td>Pode ser passado como parâmetro um objeto do tipo <a href="http://api.jquery.com/fadeIn/">fadeIn do jQuery</a>. Caso seja um Modal, pode ser passado como parâmetro um objeto com callbacks de  <a href="http://twitter.github.io/bootstrap/javascript.html#modals">eventos de Modal do Bootstrap</a>. Em ambos os casos, todas as funções de callback receberão como parametro a instância da message.</td>
+			<td>messageId</td>
+			<td>String</td>
+			<td>$(window).trigger('removeMessage', 'Payment-Unauthorized')</td>
+			<td>Remove a mensagem cujo id é igual ao messageId enviado como parâmetro</td>
 		</tr>
 	</tbody>
 </table>
 
-<h4 id="hide()"><code>.hide(hideOptions)</code></h4>
-<p>Esconde a mensagem.</p>
+<h4 id="removeAllMessages()"><code>$(window).trigger('removeAllMessage' [, booleanIncluded])</code></h4>
+<p>Remove todas as mensagens da lista.</p>
 <table class="table table-bordered table-striped">
 	<thead>
 		<tr>
@@ -157,10 +152,10 @@ Você poderá vê-lo em ação em `http://localhost:9001/`.
 	</thead>
 	<tbody>
 		<tr>
-			<td>hideOptions</td>
-			<td>object</td>
-			<td>{duration:500, complete: function(message){console.log(message);}}</td>
-			<td>Pode ser passado como parâmetro um objeto do tipo <a href="http://api.jquery.com/fadeOut/">fadeOut do jQuery</a>. Caso seja um Modal, pode ser passado como parâmetro um objeto com callbacks de <a href="http://twitter.github.io/bootstrap/javascript.html#modals">eventos de Modal do Bootstrap</a>. Em ambos os casos, todas as funções de callback receberão como parametro a instância da message.</td>
+			<td>booleanIncluded</td>
+			<td>Boolean</td>
+			<td>$(window).trigger('removeAllMessage', true)</td>
+			<td>O parâmetro booleanIncluded define se as mensagens exibidas em modais também devem ser excluídas</td>
 		</tr>
 	</tbody>
 </table>
@@ -174,4 +169,4 @@ Dependências:
 
 ------
 
-VTEX - 2013
+VTEX - 2014

@@ -20,8 +20,8 @@ class Message
 
     defaultProperties =
       id: _.uniqueId('vtex-front-message-')
-      template: @classes.TEMPLATE
       timeout: 30 * 1000
+      template: @classes.TEMPLATE
       modalTemplate: @classes.MODALTEMPLATE
       prefixClassForType: @classes.TYPE
       content:
