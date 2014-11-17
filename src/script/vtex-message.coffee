@@ -353,10 +353,10 @@ class Messages
       if window
         $(window).on "addMessage.vtex", (evt, message) =>
           @addMessage(message)
-        $(window).on "clearMessages.vtex", (evt, usingModal = false) =>
-          @removeAllMessages(usingModal)
         $(window).on "removeMessage.vtex", (evt, messageId) =>
           @removeMessage(messageId)
+        $(window).on "removeAllMessages.vtex", (evt, usingModal = false) =>
+          @removeAllMessages(usingModal)
         $(".vtex-front-messages-close-all").on "click", (evt, usingModal = false) =>
           @removeAllMessages(usingModal)
 
