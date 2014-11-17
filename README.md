@@ -47,13 +47,36 @@ Você poderá vê-lo em ação em `http://localhost:9001/`.
 		<tr>
 			<td>customOptions</td>
 			<td>object</td>
-			<td>{ajaxError:true, placeholder: '.message-placeholder', modalPlaceholder: '.modal-placeholder'}</td>
-			<td>Passada a opção ajaxError como true, o plugin handle requests AJAX com erro, exibindo um modal de erro com as suas devidas mensagens de erro.</td>
+			<td>
+			{
+				ajaxError:true, 
+				placeholder: '.message-placeholder', 
+				modalPlaceholder: '.modal-placeholder'
+			}
+			</td>
+			<td>Passada a opção ajaxError como true, o plugin handle requests AJAX com erro, exibindo um modal de erro com as suas devidas mensagens de erro. As opções de placeholder e modalPlaceholder definem onde as mensagens serão adicionadas no DOM.
+			</td>
 		</tr>
 	</tbody>
 </table>
 
-<h4 id="addMessage()"><code>$(window).trigger('addMessage', message, [messageId])</code></h4>
+```javascript
+// Modelo de customOptions para Messages
+{
+	ajaxError: 'define se o plugin deve tratar erros ajax', 
+	placeholder: 'define o elemento do DOM onde serão adicionadas as mensagens', 
+	modalPlaceholder: 'define o elemento do DOM onde serão adiconados os modais'
+}
+
+// Defaults
+{
+	ajaxError: true, 
+	placeholder: '.vtex-front-messages-placeholder', 
+	modalPlaceholder: 'body'
+}
+```
+
+<h4 id="addMessage()"><code>$(window).trigger('addMessage', message [, messageId])</code></h4>
 <p>Adiciona uma mensagem nova ao objeto de Messages.</p>
 <table class="table table-bordered table-striped">
 	<thead>
@@ -87,7 +110,7 @@ Você poderá vê-lo em ação em `http://localhost:9001/`.
 // Modelo de Message
 {
 	id: 'id unico da Message',
-  timeout: 'tempo que a mesagem será exibida, em milisegundos'
+	timeout: 'tempo que a mesagem será exibida, em milisegundos'
 	template: 'seletor CSS do template da message',
 	modalTemplate: 'seletor CSS do template da modal message',
 	prefixClassForType: 'prefixo da classe a ser concatenada com o type'
@@ -101,7 +124,7 @@ Você poderá vê-lo em ação em `http://localhost:9001/`.
 	insertMethod: 'método de inserção da mensagem no placeholder (ex: html, append, prepend, etc)'
 }
 
-// Default
+// Defaults
 {
 	id: _.uniqueId('vtex-front-message-')
 	template: '.vtex-front-messages-template'
@@ -139,7 +162,7 @@ Você poderá vê-lo em ação em `http://localhost:9001/`.
 	</tbody>
 </table>
 
-<h4 id="removeAllMessages()"><code>$(window).trigger('removeAllMessage' [, booleanIncluded])</code></h4>
+<h4 id="removeAllMessages()"><code>$(window).trigger('removeAllMessages' [, booleanIncluded])</code></h4>
 <p>Remove todas as mensagens da lista.</p>
 <table class="table table-bordered table-striped">
 	<thead>
