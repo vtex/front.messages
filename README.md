@@ -76,6 +76,8 @@ Você poderá vê-lo em ação em `http://localhost:9001/`.
 }
 ```
 
+### Message
+
 <h4 id="addMessage()"><code>$(window).trigger('addMessage', message [, messageId])</code></h4>
 <p>Adiciona uma mensagem nova ao objeto de Messages.</p>
 <table class="table table-bordered table-striped">
@@ -103,8 +105,6 @@ Você poderá vê-lo em ação em `http://localhost:9001/`.
 		</tr>
 	</tbody>
 </table>
-
-### Message
 
 ```javascript
 // Modelo de Message
