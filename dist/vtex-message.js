@@ -1,6 +1,5 @@
 (function() {
   var Message, Messages, root,
-    _this = this,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   root = typeof exports !== "undefined" && exports !== null ? exports : window;
@@ -21,6 +20,8 @@
       if (options == null) {
         options = {};
       }
+      this.hide = __bind(this.hide, this);
+      this.show = __bind(this.show, this);
       this.classes = {
         TEMPLATEDEFAULT: '.vtex-front-messages-template.vtex-front-messages-template-default',
         MODALTEMPLATEDEFAULT: '.vtex-front-messages-modal-template.vtex-front-messages-modal-template-default',
@@ -122,12 +123,7 @@
     */
 
 
-    return Message;
-
-  })();
-
-  ({
-    setTimeoutDefaults: function(options) {
+    Message.prototype.setTimeoutDefaults = function(options) {
       var ONE_SECOND, timeout;
       ONE_SECOND = 1000;
       if (options.timeout != null) {
@@ -154,22 +150,25 @@
         }
       }
       return timeout;
-    },
+    };
+
     /*
     # Exibe a mensagem da tela
     # @method show
     # @return
     */
 
-    show: function() {
-      var flagVisibleSet, modal, modalData, _i, _len, _ref;
-      if (_this.usingModal) {
+
+    Message.prototype.show = function() {
+      var flagVisibleSet, modal, modalData, _i, _len, _ref,
+        _this = this;
+      if (this.usingModal) {
         flagVisibleSet = false;
-        _ref = $('.modal.' + _this.classes.MESSAGEINSTANCE);
+        _ref = $('.modal.' + this.classes.MESSAGEINSTANCE);
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           modal = _ref[_i];
           modalData = $(modal).data('vtex-message');
-          if ((modalData.domElement[0] !== _this.domElement[0]) && (modalData.visible === true)) {
+          if ((modalData.domElement[0] !== this.domElement[0]) && (modalData.visible === true)) {
             flagVisibleSet = true;
             $(modal).one('hidden', function() {
               $(_this.domElement).modal('show');
@@ -178,39 +177,44 @@
           }
         }
         if (!flagVisibleSet) {
-          $(_this.domElement).on('show', function() {
+          $(this.domElement).on('show', function() {
             return _this.visible = true;
           });
-          $(_this.domElement).modal('show');
+          $(this.domElement).modal('show');
         }
       }
-      if (!_this.usingModal) {
-        _this.domElement.show();
-        _this.visible = true;
-        if ((_this.timeout != null) && _this.timeout !== 0) {
+      if (!this.usingModal) {
+        this.domElement.show();
+        this.visible = true;
+        if ((this.timeout != null) && this.timeout !== 0) {
           return window.setTimeout(function() {
             return _this.hide();
-          }, _this.timeout);
+          }, this.timeout);
         }
       }
-    },
+    };
+
     /*
     # Esconde a mensagem da tela
     # @method hide
     # @return
     */
 
-    hide: function() {
-      if (_this.usingModal) {
-        _this.domElement.modal('hide');
+
+    Message.prototype.hide = function() {
+      if (this.usingModal) {
+        this.domElement.modal('hide');
       }
-      if (!_this.usingModal) {
-        _this.domElement.hide();
-        _this.visible = false;
+      if (!this.usingModal) {
+        this.domElement.hide();
+        this.visible = false;
       }
-      return $(window).trigger('removeMessage.vtex', _this.id);
-    }
-  });
+      return $(window).trigger('removeMessage.vtex', this.id);
+    };
+
+    return Message;
+
+  })();
 
   /*
   # Classe Messages, que agrupa todas as mensagens
