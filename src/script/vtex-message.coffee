@@ -217,7 +217,7 @@ class Messages
       messageObj.show()
       # show placeholder if not using modal
       if (!messageObj.usingModal)
-        $(vtex.Messages.getInstance().placeholder).show();
+        $(vtex.Messages.getInstance().placeholder).addClass('placeholder-open');
 
     ###
     # Remove uma mensagem
