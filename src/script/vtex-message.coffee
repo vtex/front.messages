@@ -67,7 +67,7 @@ class Message
       else
         if not $(@modalTemplate)[0] then throw new Error("Couldn't find specified template for Modal Message")
       @domElement = $(@modalTemplate)
-      $(@domElement).addClass(@id + " " + @classes.MESSAGEINSTANCE + " " + @classes.TYPE + @type)
+      $(@domElement).addClass(@id + " " + @classes.MESSAGEINSTANCE + " " + @classes.TYPE + @type).hide()
 
     # Se não usa modal
     if !@usingModal
@@ -79,7 +79,6 @@ class Message
       @domElement = $(@template).clone(false, false)
       $(@domElement).addClass(@id + " " + @classes.MESSAGEINSTANCE + " " + @classes.TYPE + @type)
 
-    $(@domElement).hide()
     $(@domElement).data('vtex-message', @)
 
     if @content.html
@@ -87,15 +86,16 @@ class Message
         $(@classes.TITLE, @domElement).html(@content.title)
       else
         $(@classes.TITLE, @domElement).hide()
-        $(@classes.SEPARATOR, @domElement).hide()
       $(@classes.DETAIL, @domElement).html(@content.detail)
     else
       if @content.title and @content.title isnt ''
         $(@classes.TITLE, @domElement).text(@content.title)
       else
         $(@classes.TITLE, @domElement).hide()
-        $(@classes.SEPARATOR, @domElement).hide()
       $(@classes.DETAIL, @domElement).text(@content.detail)
+
+    if !(@content.title and @content.title isnt '') or !(@content.detail and @content.detail isnt '')
+      $(@classes.SEPARATOR, @domElement).hide()
 
     # Adiciona o Elemento no DOM
     if @usingModal
@@ -150,7 +150,7 @@ class Message
         $(@domElement).modal('show')
 
     if !@usingModal
-      @domElement.show()
+      @domElement.addClass('vtex-front-messages-template-opened');
       @visible = true
       # se necessário, cria timer para a mensagem
       if @.timeout? and @.timeout isnt 0
@@ -166,10 +166,13 @@ class Message
   hide: () =>
     if @usingModal
       @domElement.modal('hide')
+      $(window).trigger('removeMessage.vtex', @.id)
     if !@usingModal
-      @domElement.hide()
-      @visible = false
-    $(window).trigger('removeMessage.vtex', @.id)
+      @domElement.removeClass('vtex-front-messages-template-opened')
+      @domElement.bind("transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", =>
+        if not @domElement.hasClass('vtex-front-messages-template-opened')
+          $(window).trigger('removeMessage.vtex', @.id)
+      )
 
 ###
 # Classe Messages, que agrupa todas as mensagens
@@ -216,8 +219,8 @@ class Messages
       @messagesArray.push messageObj
       messageObj.show()
       # show placeholder if not using modal
-      if (!messageObj.usingModal)
-        $(vtex.Messages.getInstance().placeholder).addClass('placeholder-open');
+      if (not messageObj.usingModal) and (not $(vtex.Messages.getInstance().placeholder).hasClass('vtex-front-messages-placeholder-opened'))
+        $(vtex.Messages.getInstance().placeholder).addClass('vtex-front-messages-placeholder-opened');
 
     ###
     # Remove uma mensagem
@@ -230,7 +233,7 @@ class Messages
         currentMessage = @messagesArray[i]
         if (currentMessage.id is messageId)
           @messagesArray.splice(i,1)
-          if !currentMessage.usingModal
+          if not currentMessage.usingModal
             currentMessage.domElement.remove()
           else
             currentMessage.domElement.modal('hide')
@@ -270,8 +273,8 @@ class Messages
     changeContainerVisibility: ->
       notModalMessages = _.filter @messagesArray, (message) =>
         message.usingModal is false
-      if notModalMessages.length is 0
-        $(vtex.Messages.getInstance().placeholder).hide();
+      if (notModalMessages.length is 0) and $(vtex.Messages.getInstance().placeholder).hasClass('vtex-front-messages-placeholder-opened')
+        $(vtex.Messages.getInstance().placeholder).removeClass('vtex-front-messages-placeholder-opened');
 
     ###
     # Bind erros de Ajax para exibir modal de erro
