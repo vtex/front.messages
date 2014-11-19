@@ -169,10 +169,13 @@ class Message
       $(window).trigger('removeMessage.vtex', @.id)
     if !@usingModal
       @domElement.removeClass('vtex-front-messages-template-opened')
-      @domElement.bind("transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", =>
-        if not @domElement.hasClass('vtex-front-messages-template-opened')
-          $(window).trigger('removeMessage.vtex', @.id)
-      )
+      if Modernizr? and Modernizr.csstransforms and Modernizr.csstransitions and Modernizr.opacity
+        @domElement.bind("transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", =>
+          if not @domElement.hasClass('vtex-front-messages-template-opened')
+            $(window).trigger('removeMessage.vtex', @.id)
+        )
+      else
+        $(window).trigger('removeMessage.vtex', @.id)
 
 ###
 # Classe Messages, que agrupa todas as mensagens

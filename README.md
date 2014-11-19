@@ -189,6 +189,7 @@ Dependências:
 - jQuery
 - Bootstrap
 - Underscore
+- Modernizr (csstransforms, csstransitions, opacity)
 
 ------
 
