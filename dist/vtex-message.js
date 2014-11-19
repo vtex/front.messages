@@ -209,11 +209,15 @@
       }
       if (!this.usingModal) {
         this.domElement.removeClass('vtex-front-messages-template-opened');
-        return this.domElement.bind("transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", function() {
-          if (!_this.domElement.hasClass('vtex-front-messages-template-opened')) {
-            return $(window).trigger('removeMessage.vtex', _this.id);
-          }
-        });
+        if ((typeof Modernizr !== "undefined" && Modernizr !== null) && Modernizr.csstransforms && Modernizr.csstransitions && Modernizr.opacity) {
+          return this.domElement.bind("transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", function() {
+            if (!_this.domElement.hasClass('vtex-front-messages-template-opened')) {
+              return $(window).trigger('removeMessage.vtex', _this.id);
+            }
+          });
+        } else {
+          return $(window).trigger('removeMessage.vtex', this.id);
+        }
       }
     };
 
