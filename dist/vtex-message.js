@@ -68,7 +68,7 @@
           }
         }
         this.domElement = $(this.modalTemplate);
-        $(this.domElement).addClass(this.id + " " + this.classes.MESSAGEINSTANCE + " " + this.classes.TYPE + this.type);
+        $(this.domElement).addClass(this.id + " " + this.classes.MESSAGEINSTANCE + " " + this.classes.TYPE + this.type).hide();
       }
       if (!this.usingModal) {
         if (!$(vtex.Messages.getInstance().placeholder)[0]) {
@@ -84,14 +84,12 @@
         this.domElement = $(this.template).clone(false, false);
         $(this.domElement).addClass(this.id + " " + this.classes.MESSAGEINSTANCE + " " + this.classes.TYPE + this.type);
       }
-      $(this.domElement).hide();
       $(this.domElement).data('vtex-message', this);
       if (this.content.html) {
         if (this.content.title && this.content.title !== '') {
           $(this.classes.TITLE, this.domElement).html(this.content.title);
         } else {
           $(this.classes.TITLE, this.domElement).hide();
-          $(this.classes.SEPARATOR, this.domElement).hide();
         }
         $(this.classes.DETAIL, this.domElement).html(this.content.detail);
       } else {
@@ -99,9 +97,11 @@
           $(this.classes.TITLE, this.domElement).text(this.content.title);
         } else {
           $(this.classes.TITLE, this.domElement).hide();
-          $(this.classes.SEPARATOR, this.domElement).hide();
         }
         $(this.classes.DETAIL, this.domElement).text(this.content.detail);
+      }
+      if (!(this.content.title && this.content.title !== '') || !(this.content.detail && this.content.detail !== '')) {
+        $(this.classes.SEPARATOR, this.domElement).hide();
       }
       if (this.usingModal) {
         $(this.domElement).on('hidden', function() {
@@ -184,7 +184,7 @@
         }
       }
       if (!this.usingModal) {
-        this.domElement.show();
+        this.domElement.addClass('vtex-front-messages-template-opened');
         this.visible = true;
         if ((this.timeout != null) && this.timeout !== 0) {
           return window.setTimeout(function() {
@@ -202,14 +202,19 @@
 
 
     Message.prototype.hide = function() {
+      var _this = this;
       if (this.usingModal) {
         this.domElement.modal('hide');
+        $(window).trigger('removeMessage.vtex', this.id);
       }
       if (!this.usingModal) {
-        this.domElement.hide();
-        this.visible = false;
+        this.domElement.removeClass('vtex-front-messages-template-opened');
+        return this.domElement.bind("transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", function() {
+          if (!_this.domElement.hasClass('vtex-front-messages-template-opened')) {
+            return $(window).trigger('removeMessage.vtex', _this.id);
+          }
+        });
       }
-      return $(window).trigger('removeMessage.vtex', this.id);
     };
 
     return Message;
@@ -285,8 +290,8 @@
         this.deduplicateMessages(messageObj);
         this.messagesArray.push(messageObj);
         messageObj.show();
-        if (!messageObj.usingModal) {
-          return $(vtex.Messages.getInstance().placeholder).show();
+        if ((!messageObj.usingModal) && (!$(vtex.Messages.getInstance().placeholder).hasClass('vtex-front-messages-placeholder-opened'))) {
+          return $(vtex.Messages.getInstance().placeholder).addClass('vtex-front-messages-placeholder-opened');
         }
       };
 
@@ -368,8 +373,8 @@
         notModalMessages = _.filter(this.messagesArray, function(message) {
           return message.usingModal === false;
         });
-        if (notModalMessages.length === 0) {
-          return $(vtex.Messages.getInstance().placeholder).hide();
+        if ((notModalMessages.length === 0) && $(vtex.Messages.getInstance().placeholder).hasClass('vtex-front-messages-placeholder-opened')) {
+          return $(vtex.Messages.getInstance().placeholder).removeClass('vtex-front-messages-placeholder-opened');
         }
       };
 
