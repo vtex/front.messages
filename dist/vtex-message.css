@@ -15,7 +15,7 @@
     margin-left: -200px;
   }
 }
-@media (max-width: 400px) {
+@media (max-width: 399px) {
   .vtex-front-messages-placeholder {
     top: 0;
     left: 0;
