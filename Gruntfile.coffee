@@ -12,10 +12,13 @@ module.exports = (grunt) ->
   config.coffee.main.files[0].cwd = 'src/'
   config.coffee.main.files[0].dest = 'build/<%= relativePath %>/'
 
-  config.uglify.options.banner = "/* #{pkg.name} - v#{pkg.version} */\n"
-  config.uglify.target =
-    files:
-      'dist/vtex-message.min.js': ['build/front-messages-ui/script/vtex-message.js']
+  config.uglify =
+    options:
+      banner: "/* #{pkg.name} - v#{pkg.version} */\n"
+      sourceMap: true
+    main:
+      files:
+        'dist/vtex-message.min.js': ['build/front-messages-ui/script/vtex-message.js']
 
   config.less.main.files[0].src = ['style.less', 'print.less', 'vtex-message.less']
 
