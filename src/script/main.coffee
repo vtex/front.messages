@@ -12,14 +12,14 @@ $ ->
       title: 'Error'
       detail: 'Ocorreu um erro inesperado nos nossos servidores.'
     type: 'error'
-    timeout: 6000
+    timeout: 0
 
   warningMessage =
     content:
       title: 'Warning'
       detail: 'Ocorreu um erro inesperado nos nossos servidores.'
     type: 'warning'
-    timeout: 4000
+    timeout: 0
 
   successMessage =
     content:
