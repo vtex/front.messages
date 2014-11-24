@@ -1,225 +1,99 @@
-path = require('path')
-fs = require('fs')
+GruntVTEX = require 'grunt-vtex'
 
 module.exports = (grunt) ->
-	pacha = grunt.file.readJSON('tools/pachamama/pachamama.config')[0]
-	whoami = grunt.file.readJSON('meta/whoami')
-	# Tags
-	tagApplicationRoot = "&lt;%=@" + pacha.acronym + "_root%&gt;"
-	
-	# Project configuration.
-	grunt.initConfig
-		# App variables
-		relativePath: ''
-		applicationRoot: process.env['APPLICATION_ROOT'] or whoami.roots[0]
-		deployDirectory: path.normalize(process.env['DEPLOY_DIRECTORY'] ? 'deploy')
-		gitCommit: process.env['GIT_COMMIT'] or 'GIT_COMMIT'
+  pkg = grunt.file.readJSON 'package.json'
 
-		# Version variables
-		acronym: pacha.acronym
-		environmentName: process.env['ENVIRONMENT_NAME'] or '01-00-00'
-		buildNumber: process.env['BUILD_NUMBER'] or '1'
-		environmentType: process.env['ENVIRONMENT_TYPE'] or 'stable'
-		versionName: -> [grunt.config('acronym'), grunt.config('environmentName'), grunt.config('buildNumber'),
-										 grunt.config('environmentType')].join('-')
-		clean: ['build']
-		copy:
-			main:
-				expand: true
-				cwd: 'src/'
-				src: ['**', '!coffee/**', '!**/*.less']
-				dest: 'build/<%= relativePath %>'
+  config = GruntVTEX.generateConfig grunt, pkg,
+    replaceGlob: "build/**/vtex-message.js"
 
-			debug:
-				src: ['src/index.html']
-				dest: 'build/<%= relativePath %>/index.debug.html'
+  # Add app files to coffe compilation and watch
+  config.watch.coffee.files.push 'src/coffee/**/*.coffee'
+  config.watch.main.files.push 'src/**/*.html'
+  config.coffee.main.files[0].cwd = 'src/'
+  config.coffee.main.files[0].dest = 'build/<%= relativePath %>/'
 
-			commit:
-				expand: true
-				cwd: 'build/<%= relativePath %>/'
-				src: ['**', '!coffee/**', '!**/*.less']
-				dest: '<%= deployDirectory %>/<%= gitCommit %>/'
+  config.uglify =
+    options:
+      banner: "/* #{pkg.name} - v#{pkg.version} */\n"
+      sourceMap: true
+    main:
+      files:
+        'dist/vtex-message.min.js': ['build/front-messages-ui/script/vtex-message.js']
 
-			version:
-				expand: true
-				cwd: '<%= deployDirectory %>/<%= gitCommit %>/'
-				src: ['**']
-				dest: '<%= deployDirectory %>/<%= versionName() %>/'
+  config.less.main.files[0].src = ['style.less', 'print.less', 'vtex-message.less']
 
-			test: 
-				expand: true
-				cwd: 'spec/'
-				src: ['**', '!**/*.coffee']
-				dest: 'build/<%= relativePath %>/spec/'
+  config.coffee.test =
+    expand: true
+    cwd: 'spec/'
+    src: ['**/*.coffee']
+    dest: 'build/<%= relativePath %>/spec/'
+    ext: '.js'
 
-			dist:
-				expand: true
-				flatten: true
-				cwd: 'build/<%= relativePath %>/'
-				src: [
-					'js/vtex-message.js', 'js/vtex-message.min.js'
-				]
-				dest: 'dist/'
+  config.cssmin =
+    target:
+      files: [
+        expand: true,
+        cwd: "build/front-messages-ui/style/"
+        src: ['vtex-message.css'],
+        dest: 'dist/',
+        ext: '.min.css'
+      ]
+      options:
+        banner: "/* #{pkg.name} - v#{pkg.version} */\n"
 
-		coffee:
-			main:
-				expand: true
-				cwd: 'src/coffee'
-				src: ['**/*.coffee']
-				dest: 'build/<%= relativePath %>/js/'
-				ext: '.js'
+  config.copy.test =
+    expand: true
+    cwd: 'spec/'
+    src: ['**', '!**/*.coffee']
+    dest: 'build/<%= relativePath %>/spec/'
 
-			test:
-				expand: true
-				cwd: 'spec/'
-				src: ['**/*.coffee']
-				dest: 'build/<%= relativePath %>/spec/'
-				ext: '.js'
+  config.copy.dist =
+    expand: true
+    cwd: 'build//front-messages-ui/'
+    src: ['script/vtex-message.js', 'style/vtex-message.css']
+    flatten: true
+    dest: 'dist/'
 
-		less:
-			main:
-				files:
-					'build/<%= relativePath %>/style/main.css': 'src/style/main.less'
+  config.copy.checkout =
+    expand: true
+    cwd: 'build//front-messages-ui/'
+    src: ['script/vtex-message.js', 'style/vtex-message.css']
+    flatten: true
+    dest: '../vcs.checkout-ui/src/lib/front-messages-ui/'
 
-		useminPrepare:
-			html: 'build/<%= relativePath %>/index.html'
+  config.karma =
+    options:
+      configFile: 'karma.conf.js'
+    unit:
+      configFile: 'karma.conf.js',
+      background: true
+    deploy:
+      singleRun: true
 
-		usemin:
-			html: 'build/<%= relativePath %>/index.html'
+  config.watch.test =
+    files: ['src/**/*.html', 'src/**/*.coffee', 'src/**/*.js', 'src/**/*.less', 'spec/**/*.*']
+    tasks: ['dev', 'karma:unit:run']
 
-		uglify:
-			dist:
-				files:
-					'build/js/vtex-message.min.js': ['build/js/vtex-message.js']
+  tasks =
+  # Building block tasks
+    build: ['clean', 'copy:main', 'copy:pkg', 'coffee', 'less']
+    dev: ['clean', 'copy:main', 'copy:pkg', 'copy:test', 'coffee', 'less']
+    min: ['uglify'] # minifies files
+  # Deploy tasks
+    dist: ['build', 'min', 'cssmin', 'copy:dist'] # Dist - minifies files
+    checkout: ['build', 'min', 'cssmin', 'copy:dist', 'copy:checkout']
+    test: ['dev', 'karma:unit', 'watch:test']
+    vtex_deploy: ['shell:cp', 'shell:cp_br']
+  # Development tasks
+    default: ['build', 'connect', 'watch']
+    devmin: ['build', 'min', 'connect:http:keepalive'] # Minifies files and serve
+    tdd: ['dev', 'karma:unit', 'watch:test']
 
-		karma:
-			options:
-				configFile: 'karma.conf.js'
-			unit:
-				background: true
-			deploy:
-				singleRun: true
-
-		'string-replace':
-			# This replacement treats src and href attributes which cannot contain variables in order for
-			# the minification process to work. It adds the applicationRoot tag variables before the files address.
-			commit:
-				files:
-					'<%= deployDirectory %>/<%= gitCommit %>/index.html': ['<%= deployDirectory %>/<%= gitCommit %>/index.html']
-					'<%= deployDirectory %>/<%= gitCommit %>/index.debug.html': ['<%= deployDirectory %>/<%= gitCommit %>/index.debug.html']
-
-				options:
-					replacements: [
-						pattern: /src="(\.\.\/)?(?!http|\/|\/\/|\#|\&|\'\&)/ig
-						replacement: 'src="' + tagApplicationRoot
-					,
-						pattern: /href="(\.\.\/)?(?!http|\/|\/\/|\#|\&|\'\&)/ig
-						replacement: 'href="' + tagApplicationRoot
-					,
-						pattern: '<script src="http://localhost:35729/livereload.js"></script>'
-						replacement: ''
-					]
-			# Here, all tag variables are replaced for production-ready endpoints.
-			version:
-				files:
-					'<%= deployDirectory %>/<%= versionName() %>/index.html': ['<%= deployDirectory %>/<%= versionName() %>/index.html']
-					'<%= deployDirectory %>/<%= versionName() %>/index.debug.html': ['<%= deployDirectory %>/<%= versionName() %>/index.debug.html']
-
-				options:
-					replacements: [
-						pattern: new RegExp(tagApplicationRoot, "gi")
-						replacement: '<%= applicationRoot %>/'
-					]
-
-		connect:
-			dev:
-				options:
-					port: 9001
-					base: 'build/'
-
-		watch:
-			options:
-				livereload: true
-
-			dev:
-				files: ['src/**/*.html', 'src/**/*.coffee', 'src/**/*.js', 'src/**/*.less']
-				tasks: ['dev']
-
-			prod:
-				files: ['src/**/*.html', 'src/**/*.coffee', 'src/**/*.js', 'src/**/*.less']
-				tasks: ['prod']
-
-			test:
-				files: ['src/**/*.html', 'src/**/*.coffee', 'src/**/*.js', 'src/**/*.less', 'spec/**/*.*']
-				tasks: ['dev', 'karma:unit:run']
-
-	grunt.loadNpmTasks 'grunt-contrib-connect'
-	grunt.loadNpmTasks 'grunt-contrib-concat'
-	grunt.loadNpmTasks 'grunt-contrib-copy'
-	grunt.loadNpmTasks 'grunt-contrib-clean'
-	grunt.loadNpmTasks 'grunt-contrib-coffee'
-	grunt.loadNpmTasks 'grunt-contrib-less'
-	grunt.loadNpmTasks 'grunt-contrib-uglify'
-	grunt.loadNpmTasks 'grunt-contrib-cssmin'
-	grunt.loadNpmTasks 'grunt-contrib-watch'
-	grunt.loadNpmTasks 'grunt-usemin'
-	grunt.loadNpmTasks 'grunt-string-replace'
-	grunt.loadNpmTasks 'grunt-karma'
-
-	grunt.registerTask 'default', ['dev-watch']
-
-	# Dev
-	grunt.registerTask 'dev', ['clean', 'copy:main', 'copy:test', 'coffee', 'less']
-	grunt.registerTask 'dev-watch', ['dev', 'connect', 'remote', 'watch:dev']
-
-	# Prod - minifies files
-	grunt.registerTask 'prod', ['dev', 'copy:debug', 'useminPrepare', 'concat', 'uglify', 'cssmin', 'usemin']
-	grunt.registerTask 'prod-watch', ['prod', 'connect', 'remote', 'watch:prod']
-
-	# Test
-	grunt.registerTask 'test', ['dev', 'karma:deploy']
-	grunt.registerTask 'test-watch', ['dev', 'karma:unit', 'watch:test']
-
-	# TDD
-	grunt.registerTask 'tdd', ['dev', 'connect', 'remote', 'karma:unit', 'watch:test']
-
-	# Dist
-	grunt.registerTask 'dist', ['prod', 'copy:dist']
-
-	# Tasks for deploy build
-	grunt.registerTask 'gen-commit', ['clean', 'copy:main', 'copy:test', 'coffee', 'less', 'copy:debug',
-										'useminPrepare', 'concat', 'uglify', 'cssmin', 'usemin', 
-										'copy:commit', 'string-replace:commit']
-
-	# Generates version folder
-	grunt.registerTask 'gen-version', ->
-		grunt.log.writeln 'applicationRoot: '.cyan + grunt.config('applicationRoot').green
-		grunt.log.writeln 'environmentName: '.cyan + grunt.config('environmentName').green
-		grunt.log.writeln 'buildNumber: '.cyan + grunt.config('buildNumber').green
-		grunt.log.writeln 'environmentType: '.cyan + grunt.config('environmentType').green
-		grunt.log.writeln 'Version deploy directory: '.cyan + (path.resolve grunt.config('deployDirectory'), grunt.config('versionName')()).green
-		grunt.task.run ['copy:version', 'string-replace:version']
-
-	# Deploy - creates deploy folder structure
-	grunt.registerTask 'deploy', ->
-		commit = grunt.config('gitCommit')
-		deployDir = path.resolve grunt.config('deployDirectory'), commit
-		deployExists = false
-		grunt.log.writeln 'Commit deploy directory: '.cyan + deployDir.green
-		try
-			deployExists = fs.existsSync deployDir
-		catch e
-			grunt.log.writeln 'Error reading deploy folder'.red
-			console.log e
-
-		if deployExists
-			grunt.log.writeln 'Folder '.cyan + deployDir.green + ' already exists.'.cyan
-			grunt.log.writeln 'Skipping build process and generating version folder.'.cyan
-			grunt.task.run ['gen-version']
-		else
-			grunt.task.run ['gen-commit', 'karma:deploy', 'gen-version']
-
-	#	Remote task
-	grunt.registerTask 'remote', 'Run Remote proxy server', ->
-		require 'coffee-script'
-		require('remote')()
+  # Project configuration.
+  grunt.initConfig config
+  grunt.loadNpmTasks name for name of pkg.devDependencies when name[0..5] is 'grunt-' and name isnt 'grunt-vtex'
+  grunt.registerTask 'nolr', ->
+    # Turn off LiveReload in development mode
+    grunt.config 'watch.options.livereload', false
+    return true
+  grunt.registerTask taskName, taskArray for taskName, taskArray of tasks
