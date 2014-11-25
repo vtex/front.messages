@@ -30,6 +30,12 @@
     top: 8px;
     right: 5px;
     z-index: 2;
+    @media (min-width:400px) {
+      font-size: 20px;
+    }
+    @media (max-width:399px) {
+      font-size: 32px;
+    }
   }
 }
 
@@ -49,24 +55,7 @@
 
   &:first-of-type {
     padding-top: 14px;
-  }html:not(csstransitions) {
-
-  .vtex-front-messages-placeholder {
-    display: none;
-
-    &.vtex-front-messages-placeholder-opened {
-      display: block;
-    }
   }
-
-  .vtex-front-messages-template {
-    display: none;
-
-    &.vtex-front-messages-template-opened {
-      display: block;
-    }
-  }
-}
 
   &.vtex-front-messages-type-success {
     border-color: #4cae4c;
