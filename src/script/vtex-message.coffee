@@ -29,13 +29,13 @@ class Message
         detail: ''
       close: 'Close'
       type: 'info' # possible types are: ['success', 'info', 'warning', 'danger', 'fatal', 'error']
-      visible: true
       usingModal: false
       domElement: $()
       insertMethod: 'append'
+      timer: null
 
     _.extend(@, defaultProperties, options)
-    @.timeout = @setTimeoutDefaults(options)
+    @.timeout = @getTimeoutDefaults(options)
 
     modalDefaultTemplate = """
     <div class="vtex-front-messages-modal-template vtex-front-messages-modal-template-default modal hide fade">
@@ -97,24 +97,14 @@ class Message
     if !(@content.title and @content.title isnt '') or !(@content.detail and @content.detail isnt '')
       $(@classes.SEPARATOR, @domElement).hide()
 
-    # Adiciona o Elemento no DOM
-    if @usingModal
-      $(@domElement).on 'hidden', =>
-        @visible = false
-        $(window).trigger('removeMessage.vtex', @.id)
-      $(vtex.Messages.getInstance().modalPlaceholder).append(@domElement)
-    else
-      $(vtex.Messages.getInstance().placeholder)[@insertMethod](@domElement)
-
-    @show()
     return
 
   ###
   # Configura o timeout da mensagem de acordo com o 'type' da mesma
-  # @method setTimeoutDefaults
+  # @method getTimeoutDefaults
   # @return
   ###
-  setTimeoutDefaults: (options) ->
+  getTimeoutDefaults: (options) ->
     ONE_SECOND = 1000
     if options.timeout?
       timeout = options.timeout
@@ -128,6 +118,14 @@ class Message
         else timeout = 30 * ONE_SECOND
     return timeout
 
+  startTimeout: () ->
+    if @timer
+      clearTimeout(@timer);
+    @timer = window.setTimeout =>
+      @hide()
+    , @timeout
+
+
   ###
   # Exibe a mensagem da tela
   # @method show
@@ -135,28 +133,27 @@ class Message
   ###
   show: () =>
     if @usingModal
-      # tratamento para o caso de já haver um modal aberto
-      flagVisibleSet = false
-      for modal in $('.modal.' + @classes.MESSAGEINSTANCE)
-        modalData = $(modal).data('vtex-message')
-        if (modalData.domElement[0] isnt @domElement[0]) and (modalData.visible is true)
-          flagVisibleSet = true
-          $(modal).one 'hidden', =>
-            $(@domElement).modal('show')
-            @visible = true
+      modalArray = vtex.Messages.getInstance().modalQueue
+      if _.indexOf(modalArray, @) is -1
+        $(@domElement).one 'hidden', =>
+          @hide()
+          modalArray.splice(0,1)
+          if modalArray.length isnt 0
+            $(modalArray[0].domElement).modal 'show'
 
-      if not flagVisibleSet
-        $(@domElement).on 'show', => @visible = true
-        $(@domElement).modal('show')
+        # Se o array está vazio, não há modal visível, logo, mostramos o modal
+        if modalArray.length is 0
+          $(@domElement).modal 'show'
+
+        # Adiciona a mensagem no array
+        if modalArray.indexOf(@) is -1
+          modalArray.push @
 
     if !@usingModal
       @domElement.addClass('vtex-front-messages-template-opened');
-      @visible = true
       # se necessário, cria timer para a mensagem
       if @.timeout? and @.timeout isnt 0
-        window.setTimeout =>
-          @hide()
-        , @timeout
+        @startTimeout()
 
   ###
   # Esconde a mensagem da tela
@@ -165,17 +162,16 @@ class Message
   ###
   hide: () =>
     if @usingModal
-      @domElement.modal('hide')
-      $(window).trigger('removeMessage.vtex', @.id)
+      $(window).trigger('removeMessage.vtex', @id)
     if !@usingModal
       @domElement.removeClass('vtex-front-messages-template-opened')
       if Modernizr? and Modernizr.csstransforms and Modernizr.csstransitions and Modernizr.opacity
         @domElement.bind("transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", =>
           if not @domElement.hasClass('vtex-front-messages-template-opened')
-            $(window).trigger('removeMessage.vtex', @.id)
+            $(window).trigger('removeMessage.vtex', @id)
         )
       else
-        $(window).trigger('removeMessage.vtex', @.id)
+        $(window).trigger('removeMessage.vtex', @id)
 
 ###
 # Classe Messages, que agrupa todas as mensagens
@@ -204,6 +200,7 @@ class Messages
         messagesArray: []
         placeholder: @classes.PLACEHOLDER
         modalPlaceholder: @classes.MODALPLACEHOLDER
+        modalQueue: []
       _.extend(@, defaultProperties, options)
 
       @buildPlaceholderTemplate()
@@ -218,12 +215,21 @@ class Messages
     ###
     addMessage: (message) ->
       messageObj = new Message(message)
-      @deduplicateMessages(messageObj)
-      @messagesArray.push messageObj
-      messageObj.show()
-      # show placeholder if not using modal
-      if (not messageObj.usingModal) and (not $(vtex.Messages.getInstance().placeholder).hasClass('vtex-front-messages-placeholder-opened'))
-        $(vtex.Messages.getInstance().placeholder).addClass('vtex-front-messages-placeholder-opened');
+      if not @isMessageDuplicated(messageObj)
+        @messagesArray.push messageObj
+        # insere mensagem no DOM
+        if messageObj.usingModal
+          $(messageObj.domElement).on 'hidden', =>
+            $(window).trigger('removeMessage.vtex', messageObj.id)
+          $(@modalPlaceholder).append(messageObj.domElement)
+        else
+          $(@placeholder)[messageObj.insertMethod](messageObj.domElement)
+          # show placeholder
+          if (not $(vtex.Messages.getInstance().placeholder).hasClass('vtex-front-messages-placeholder-opened'))
+            $(vtex.Messages.getInstance().placeholder).addClass('vtex-front-messages-placeholder-opened');
+        messageObj.show()
+      else if messageObj.timeout isnt 0
+        @resetDuplicatedMessageTimeout(messageObj)
 
     ###
     # Remove uma mensagem
@@ -243,15 +249,28 @@ class Messages
       @.changeContainerVisibility()
 
     ###
-    # Esconde mensagens duplicadas
-    # @method deduplicateMessages
+    # Reseta o timeout da mensagem que foi duplicada
+    # @method resetDuplicatedMessageTimeout
     # @param {Object} messageObj objeto Message contra o qual as outras mensagens devem ser testadas
     # @return
     ###
-    deduplicateMessages: (messageObj) ->
+    resetDuplicatedMessageTimeout: (messageObj) =>
       _.each @messagesArray, (message) =>
         if (message.content.title is messageObj.content.title) and (message.content.detail is messageObj.content.detail) and (message.usingModal is messageObj.usingModal) and (message.type is messageObj.type)
-          message.hide()
+          message.startTimeout()
+
+    ###
+    # Verifica se existem mensagens duplicadas
+    # @method isMessageDuplicated
+    # @param {Object} messageObj objeto Message contra o qual as outras mensagens devem ser testadas
+    # @return
+    ###
+    isMessageDuplicated: (messageObj) ->
+      isMessageDuplicated = false
+      _.each @messagesArray, (message) =>
+        if (message.content.title is messageObj.content.title) and (message.content.detail is messageObj.content.detail) and (message.usingModal is messageObj.usingModal) and (message.type is messageObj.type)
+          isMessageDuplicated = true
+      return isMessageDuplicated
 
     ###
     # Esconde todas as mensagens
