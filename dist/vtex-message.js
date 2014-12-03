@@ -366,7 +366,13 @@
         isMessageDuplicated = false;
         _.each(this.messagesArray, function(message) {
           if ((message.content.title === messageObj.content.title) && (message.content.detail === messageObj.content.detail) && (message.usingModal === messageObj.usingModal) && (message.type === messageObj.type)) {
-            return isMessageDuplicated = true;
+            if (messageObj.id.substr(0, 19) === 'vtex-front-message-') {
+              return isMessageDuplicated = true;
+            } else if (message.id !== messageObj.id) {
+              return isMessageDuplicated = false;
+            } else if (message.id === messageObj.id) {
+              return isMessageDuplicated = true;
+            }
           }
         });
         return isMessageDuplicated;

@@ -272,7 +272,12 @@ class Messages
       isMessageDuplicated = false
       _.each @messagesArray, (message) =>
         if (message.content.title is messageObj.content.title) and (message.content.detail is messageObj.content.detail) and (message.usingModal is messageObj.usingModal) and (message.type is messageObj.type)
-          isMessageDuplicated = true
+          if (messageObj.id.substr(0,19) is 'vtex-front-message-') # se a mensagem tem um id default basta as condições anteriores
+            isMessageDuplicated = true
+          else if (message.id isnt messageObj.id) # se a mensagem tem um id customizado e é diferente é outra
+            isMessageDuplicated = false
+          else if (message.id is messageObj.id) # se a mensagem tem um id customizado e é igual é a mesma
+            isMessageDuplicated = true
       return isMessageDuplicated
 
     ###
