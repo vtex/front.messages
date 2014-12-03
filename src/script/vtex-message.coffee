@@ -30,6 +30,7 @@ class Message
       close: 'Close'
       type: 'info' # possible types are: ['success', 'info', 'warning', 'danger', 'fatal', 'error']
       usingModal: false
+      usingDefaultTemplate: true
       domElement: $()
       insertMethod: 'append'
       timer: null
@@ -64,8 +65,10 @@ class Message
       if not $(vtex.Messages.getInstance().modalPlaceholder)[0] then throw new Error("Couldn't find placeholder for Modal Message")
       if @modalTemplate is @classes.MODALTEMPLATE
         @modalTemplate = modalDefaultTemplate
+        @usingDefaultTemplate = true
       else
         if not $(@modalTemplate)[0] then throw new Error("Couldn't find specified template for Modal Message")
+        @usingDefaultTemplate = false
       @domElement = $(@modalTemplate)
       $(@domElement).addClass(@id + " " + @classes.MESSAGEINSTANCE + " " + @classes.TYPE + @type)
 
@@ -74,8 +77,10 @@ class Message
       if not $(vtex.Messages.getInstance().placeholder)[0] then throw new Error("Couldn't find placeholder for Message")
       if @template is @classes.TEMPLATE
         @template = defaultTemplate
+        @usingDefaultTemplate = true
       else
         if not $(@template)[0] then throw new Error("Couldn't find specified template for Message")
+        @usingDefaultTemplate = false
       @domElement = $(@template).clone(false, false)
       $(@domElement).addClass(@id + " " + @classes.MESSAGEINSTANCE + " " + @classes.TYPE + @type)
 
@@ -248,7 +253,8 @@ class Messages
           if not currentMessage.usingModal
             currentMessage.domElement.remove()
           else
-            currentMessage.domElement.modal('hide')
+            if (currentMessage.usingDefaultTemplate) # remove do DOM se tem um id default
+              currentMessage.domElement.remove()
       @.changeContainerVisibility()
 
     ###
