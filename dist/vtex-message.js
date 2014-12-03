@@ -49,12 +49,12 @@
         timer: null
       };
       _.extend(this, defaultProperties, options);
-      this.timeout = this.getTimeoutDefaults(options);
-      modalDefaultTemplate = "<div class=\"vtex-front-messages-modal-template vtex-front-messages-modal-template-default modal hide fade\">\n  <div class=\"modal-header\">\n    <h3 class=\"vtex-front-messages-title\"></h3>\n  </div>\n  <div class=\"modal-body\">\n    <p class=\"vtex-front-messages-detail\"></p>\n  </div>\n  <div class=\"modal-footer\">\n    <button class=\"btn\" data-dismiss=\"modal\" aria-hidden=\"true\">" + this.close + "</button>\n  </div>\n</div>";
-      defaultTemplate = "<div class=\"vtex-front-messages-template\">\n  <span class=\"vtex-front-messages-title\"></span><span class=\"vtex-front-messages-separator\"> - </span><span 						class=\"vtex-front-messages-detail\"></span>\n</div>";
       if (this.type === 'fatal') {
         this.usingModal = true;
       }
+      this.timeout = this.getTimeoutDefaults(options);
+      modalDefaultTemplate = "<div class=\"vtex-front-messages-modal-template vtex-front-messages-modal-template-default modal hide fade\">\n  <div class=\"modal-header\">\n    <h3 class=\"vtex-front-messages-title\"></h3>\n  </div>\n  <div class=\"modal-body\">\n    <p class=\"vtex-front-messages-detail\"></p>\n  </div>\n  <div class=\"modal-footer\">\n    <button class=\"btn\" data-dismiss=\"modal\" aria-hidden=\"true\">" + this.close + "</button>\n  </div>\n</div>";
+      defaultTemplate = "<div class=\"vtex-front-messages-template\">\n  <span class=\"vtex-front-messages-title\"></span><span class=\"vtex-front-messages-separator\"> - </span><span 						class=\"vtex-front-messages-detail\"></span>\n</div>";
       if (this.usingModal) {
         if (!$(vtex.Messages.getInstance().modalPlaceholder)[0]) {
           throw new Error("Couldn't find placeholder for Modal Message");
@@ -67,7 +67,7 @@
           }
         }
         this.domElement = $(this.modalTemplate);
-        $(this.domElement).addClass(this.id + " " + this.classes.MESSAGEINSTANCE + " " + this.classes.TYPE + this.type).hide();
+        $(this.domElement).addClass(this.id + " " + this.classes.MESSAGEINSTANCE + " " + this.classes.TYPE + this.type);
       }
       if (!this.usingModal) {
         if (!$(vtex.Messages.getInstance().placeholder)[0]) {
@@ -138,17 +138,23 @@
             timeout = 30 * ONE_SECOND;
         }
       }
-      return timeout;
+      if (!this.usingModal) {
+        return timeout;
+      } else {
+        return 0;
+      }
     };
 
     Message.prototype.startTimeout = function() {
       var _this = this;
-      if (this.timer) {
-        clearTimeout(this.timer);
+      if (!this.usingModal) {
+        if (this.timer) {
+          clearTimeout(this.timer);
+        }
+        return this.timer = window.setTimeout(function() {
+          return _this.hide();
+        }, this.timeout);
       }
-      return this.timer = window.setTimeout(function() {
-        return _this.hide();
-      }, this.timeout);
     };
 
     /*
@@ -300,7 +306,7 @@
             }
           }
           return messageObj.show();
-        } else if (messageObj.timeout !== 0) {
+        } else if (messageObj.timeout !== 0 && !messageObj.usingModal) {
           return this.resetDuplicatedMessageTimeout(messageObj);
         }
       };

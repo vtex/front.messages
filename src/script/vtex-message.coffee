@@ -35,6 +35,8 @@ class Message
       timer: null
 
     _.extend(@, defaultProperties, options)
+
+    if @type is 'fatal' then @usingModal = true
     @.timeout = @getTimeoutDefaults(options)
 
     modalDefaultTemplate = """
@@ -57,8 +59,6 @@ class Message
     </div>
     """
 
-    if @type is 'fatal' then @usingModal = true
-
     # Se usa modal
     if @usingModal
       if not $(vtex.Messages.getInstance().modalPlaceholder)[0] then throw new Error("Couldn't find placeholder for Modal Message")
@@ -67,7 +67,7 @@ class Message
       else
         if not $(@modalTemplate)[0] then throw new Error("Couldn't find specified template for Modal Message")
       @domElement = $(@modalTemplate)
-      $(@domElement).addClass(@id + " " + @classes.MESSAGEINSTANCE + " " + @classes.TYPE + @type).hide()
+      $(@domElement).addClass(@id + " " + @classes.MESSAGEINSTANCE + " " + @classes.TYPE + @type)
 
     # Se não usa modal
     if !@usingModal
@@ -116,15 +116,18 @@ class Message
         when 'error' then timeout = 25 * ONE_SECOND
         when 'danger' then timeout = 30 * ONE_SECOND
         else timeout = 30 * ONE_SECOND
-    return timeout
+    if not @usingModal
+      return timeout
+    else
+      return 0
 
   startTimeout: () ->
-    if @timer
-      clearTimeout(@timer);
-    @timer = window.setTimeout =>
-      @hide()
-    , @timeout
-
+    if not @usingModal
+      if @timer
+        clearTimeout(@timer);
+      @timer = window.setTimeout =>
+        @hide()
+      , @timeout
 
   ###
   # Exibe a mensagem da tela
@@ -228,7 +231,7 @@ class Messages
           if (not $(vtex.Messages.getInstance().placeholder).hasClass('vtex-front-messages-placeholder-opened'))
             $(vtex.Messages.getInstance().placeholder).addClass('vtex-front-messages-placeholder-opened');
         messageObj.show()
-      else if messageObj.timeout isnt 0
+      else if messageObj.timeout isnt 0 and not messageObj.usingModal
         @resetDuplicatedMessageTimeout(messageObj)
 
     ###
