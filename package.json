@@ -1,6 +1,6 @@
 {
   "name": "front-messages-ui",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "deploy": "deploy/",
   "readmeFilename": "README.md",
   "description": "jQuery and Bootstrap based messages plugin.",
