@@ -15,8 +15,7 @@
 
   Message = (function() {
     function Message(options) {
-      var defaultProperties, defaultTemplate, modalDefaultTemplate,
-        _this = this;
+      var defaultProperties, defaultTemplate, modalDefaultTemplate;
       if (options == null) {
         options = {};
       }
@@ -44,13 +43,13 @@
         },
         close: 'Close',
         type: 'info',
-        visible: true,
         usingModal: false,
         domElement: $(),
-        insertMethod: 'append'
+        insertMethod: 'append',
+        timer: null
       };
       _.extend(this, defaultProperties, options);
-      this.timeout = this.setTimeoutDefaults(options);
+      this.timeout = this.getTimeoutDefaults(options);
       modalDefaultTemplate = "<div class=\"vtex-front-messages-modal-template vtex-front-messages-modal-template-default modal hide fade\">\n  <div class=\"modal-header\">\n    <h3 class=\"vtex-front-messages-title\"></h3>\n  </div>\n  <div class=\"modal-body\">\n    <p class=\"vtex-front-messages-detail\"></p>\n  </div>\n  <div class=\"modal-footer\">\n    <button class=\"btn\" data-dismiss=\"modal\" aria-hidden=\"true\">" + this.close + "</button>\n  </div>\n</div>";
       defaultTemplate = "<div class=\"vtex-front-messages-template\">\n  <span class=\"vtex-front-messages-title\"></span><span class=\"vtex-front-messages-separator\"> - </span><span 						class=\"vtex-front-messages-detail\"></span>\n</div>";
       if (this.type === 'fatal') {
@@ -103,27 +102,17 @@
       if (!(this.content.title && this.content.title !== '') || !(this.content.detail && this.content.detail !== '')) {
         $(this.classes.SEPARATOR, this.domElement).hide();
       }
-      if (this.usingModal) {
-        $(this.domElement).on('hidden', function() {
-          _this.visible = false;
-          return $(window).trigger('removeMessage.vtex', _this.id);
-        });
-        $(vtex.Messages.getInstance().modalPlaceholder).append(this.domElement);
-      } else {
-        $(vtex.Messages.getInstance().placeholder)[this.insertMethod](this.domElement);
-      }
-      this.show();
       return;
     }
 
     /*
     # Configura o timeout da mensagem de acordo com o 'type' da mesma
-    # @method setTimeoutDefaults
+    # @method getTimeoutDefaults
     # @return
     */
 
 
-    Message.prototype.setTimeoutDefaults = function(options) {
+    Message.prototype.getTimeoutDefaults = function(options) {
       var ONE_SECOND, timeout;
       ONE_SECOND = 1000;
       if (options.timeout != null) {
@@ -152,6 +141,16 @@
       return timeout;
     };
 
+    Message.prototype.startTimeout = function() {
+      var _this = this;
+      if (this.timer) {
+        clearTimeout(this.timer);
+      }
+      return this.timer = window.setTimeout(function() {
+        return _this.hide();
+      }, this.timeout);
+    };
+
     /*
     # Exibe a mensagem da tela
     # @method show
@@ -160,36 +159,30 @@
 
 
     Message.prototype.show = function() {
-      var flagVisibleSet, modal, modalData, _i, _len, _ref,
+      var modalArray,
         _this = this;
       if (this.usingModal) {
-        flagVisibleSet = false;
-        _ref = $('.modal.' + this.classes.MESSAGEINSTANCE);
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          modal = _ref[_i];
-          modalData = $(modal).data('vtex-message');
-          if ((modalData.domElement[0] !== this.domElement[0]) && (modalData.visible === true)) {
-            flagVisibleSet = true;
-            $(modal).one('hidden', function() {
-              $(_this.domElement).modal('show');
-              return _this.visible = true;
-            });
-          }
-        }
-        if (!flagVisibleSet) {
-          $(this.domElement).on('show', function() {
-            return _this.visible = true;
+        modalArray = vtex.Messages.getInstance().modalQueue;
+        if (_.indexOf(modalArray, this) === -1) {
+          $(this.domElement).one('hidden', function() {
+            _this.hide();
+            modalArray.splice(0, 1);
+            if (modalArray.length !== 0) {
+              return $(modalArray[0].domElement).modal('show');
+            }
           });
-          $(this.domElement).modal('show');
+          if (modalArray.length === 0) {
+            $(this.domElement).modal('show');
+          }
+          if (modalArray.indexOf(this) === -1) {
+            modalArray.push(this);
+          }
         }
       }
       if (!this.usingModal) {
         this.domElement.addClass('vtex-front-messages-template-opened');
-        this.visible = true;
         if ((this.timeout != null) && this.timeout !== 0) {
-          return window.setTimeout(function() {
-            return _this.hide();
-          }, this.timeout);
+          return this.startTimeout();
         }
       }
     };
@@ -204,7 +197,6 @@
     Message.prototype.hide = function() {
       var _this = this;
       if (this.usingModal) {
-        this.domElement.modal('hide');
         $(window).trigger('removeMessage.vtex', this.id);
       }
       if (!this.usingModal) {
@@ -261,6 +253,7 @@
         if (options == null) {
           options = {};
         }
+        this.resetDuplicatedMessageTimeout = __bind(this.resetDuplicatedMessageTimeout, this);
         this.removeMessage = __bind(this.removeMessage, this);
         this.classes = {
           PLACEHOLDER: '.vtex-front-messages-placeholder',
@@ -270,7 +263,8 @@
           ajaxError: false,
           messagesArray: [],
           placeholder: this.classes.PLACEHOLDER,
-          modalPlaceholder: this.classes.MODALPLACEHOLDER
+          modalPlaceholder: this.classes.MODALPLACEHOLDER,
+          modalQueue: []
         };
         _.extend(this, defaultProperties, options);
         this.buildPlaceholderTemplate();
@@ -289,13 +283,25 @@
 
 
       VtexMessages.prototype.addMessage = function(message) {
-        var messageObj;
+        var messageObj,
+          _this = this;
         messageObj = new Message(message);
-        this.deduplicateMessages(messageObj);
-        this.messagesArray.push(messageObj);
-        messageObj.show();
-        if ((!messageObj.usingModal) && (!$(vtex.Messages.getInstance().placeholder).hasClass('vtex-front-messages-placeholder-opened'))) {
-          return $(vtex.Messages.getInstance().placeholder).addClass('vtex-front-messages-placeholder-opened');
+        if (!this.isMessageDuplicated(messageObj)) {
+          this.messagesArray.push(messageObj);
+          if (messageObj.usingModal) {
+            $(messageObj.domElement).on('hidden', function() {
+              return $(window).trigger('removeMessage.vtex', messageObj.id);
+            });
+            $(this.modalPlaceholder).append(messageObj.domElement);
+          } else {
+            $(this.placeholder)[messageObj.insertMethod](messageObj.domElement);
+            if (!$(vtex.Messages.getInstance().placeholder).hasClass('vtex-front-messages-placeholder-opened')) {
+              $(vtex.Messages.getInstance().placeholder).addClass('vtex-front-messages-placeholder-opened');
+            }
+          }
+          return messageObj.show();
+        } else if (messageObj.timeout !== 0) {
+          return this.resetDuplicatedMessageTimeout(messageObj);
         }
       };
 
@@ -324,20 +330,40 @@
       };
 
       /*
-      # Esconde mensagens duplicadas
-      # @method deduplicateMessages
+      # Reseta o timeout da mensagem que foi duplicada
+      # @method resetDuplicatedMessageTimeout
       # @param {Object} messageObj objeto Message contra o qual as outras mensagens devem ser testadas
       # @return
       */
 
 
-      VtexMessages.prototype.deduplicateMessages = function(messageObj) {
+      VtexMessages.prototype.resetDuplicatedMessageTimeout = function(messageObj) {
         var _this = this;
         return _.each(this.messagesArray, function(message) {
           if ((message.content.title === messageObj.content.title) && (message.content.detail === messageObj.content.detail) && (message.usingModal === messageObj.usingModal) && (message.type === messageObj.type)) {
-            return message.hide();
+            return message.startTimeout();
           }
         });
+      };
+
+      /*
+      # Verifica se existem mensagens duplicadas
+      # @method isMessageDuplicated
+      # @param {Object} messageObj objeto Message contra o qual as outras mensagens devem ser testadas
+      # @return
+      */
+
+
+      VtexMessages.prototype.isMessageDuplicated = function(messageObj) {
+        var isMessageDuplicated,
+          _this = this;
+        isMessageDuplicated = false;
+        _.each(this.messagesArray, function(message) {
+          if ((message.content.title === messageObj.content.title) && (message.content.detail === messageObj.content.detail) && (message.usingModal === messageObj.usingModal) && (message.type === messageObj.type)) {
+            return isMessageDuplicated = true;
+          }
+        });
+        return isMessageDuplicated;
       };
 
       /*

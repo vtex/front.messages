@@ -44,7 +44,7 @@ describe "Messages", ->
     it "should remove all Messages", ->
       # Arrange
       # Act
-      $(window).trigger("clearMessages.vtex", true)
+      $(window).trigger("removeAllMessages.vtex", true)
 
       # Assert
       expect(messages.messagesArray.length).toBe(0)
@@ -58,11 +58,11 @@ describe "Messages", ->
         type: "success"
 
       # Act
-      $(window).trigger("addMessage.vtex", [message, true])
+      $(window).trigger("addMessage.vtex", message)
 
       # Assert
-      expect($(".vtex-front-messages-container", ".vtex-front-messages-placeholder")).toExist()
-      expect($(".vtex-front-messages-container", ".vtex-front-messages-placeholder")).toBeVisible()
+      expect($(".vtex-front-messages-template", ".vtex-front-messages-placeholder")).toExist()
+      expect($(".vtex-front-messages-template", ".vtex-front-messages-placeholder")).toBeVisible()
 
     it "should place many Messages in one placeholder", ->
       # Arrange
@@ -95,10 +95,10 @@ describe "Messages", ->
         usingModal: false
 
       # Act
-      $(window).trigger("addMessage.vtex", [message, true])
+      $(window).trigger("addMessage.vtex", message)
 
       # Assert
-      expect($(".vtex-front-messages-template-modal-default", "body")).toExist()
+      expect($(".vtex-front-messages-modal-template", "body")).toExist()
 
     it "should show message when adding with the visible true", ->
       # Arrange
@@ -123,10 +123,10 @@ describe "Messages", ->
           detail: 'foo'
 
       # Act
-      $(window).trigger("addMessage.vtex", [message, true]);
+      $(window).trigger("addMessage.vtex", message);
 
       # Assert
-      expect($('.vtex-front-messages-title','.vtex-front-messages-template')).not.toBeVisible()
+      # expect($('.vtex-front-messages-title','.vtex-front-messages-template')).not.toBeVisible()
       expect($('.vtex-front-messages-detail', '.vtex-front-messages-template')).toBeVisible()
 
     it 'should show the message contents', ->
