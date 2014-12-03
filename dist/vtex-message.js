@@ -44,6 +44,7 @@
         close: 'Close',
         type: 'info',
         usingModal: false,
+        usingDefaultTemplate: true,
         domElement: $(),
         insertMethod: 'append',
         timer: null
@@ -61,10 +62,12 @@
         }
         if (this.modalTemplate === this.classes.MODALTEMPLATE) {
           this.modalTemplate = modalDefaultTemplate;
+          this.usingDefaultTemplate = true;
         } else {
           if (!$(this.modalTemplate)[0]) {
             throw new Error("Couldn't find specified template for Modal Message");
           }
+          this.usingDefaultTemplate = false;
         }
         this.domElement = $(this.modalTemplate);
         $(this.domElement).addClass(this.id + " " + this.classes.MESSAGEINSTANCE + " " + this.classes.TYPE + this.type);
@@ -75,10 +78,12 @@
         }
         if (this.template === this.classes.TEMPLATE) {
           this.template = defaultTemplate;
+          this.usingDefaultTemplate = true;
         } else {
           if (!$(this.template)[0]) {
             throw new Error("Couldn't find specified template for Message");
           }
+          this.usingDefaultTemplate = false;
         }
         this.domElement = $(this.template).clone(false, false);
         $(this.domElement).addClass(this.id + " " + this.classes.MESSAGEINSTANCE + " " + this.classes.TYPE + this.type);
@@ -329,6 +334,9 @@
               currentMessage.domElement.remove();
             } else {
               currentMessage.domElement.modal('hide');
+              if (currentMessage.usingDefaultTemplate) {
+                currentMessage.domElement.remove();
+              }
             }
           }
         }

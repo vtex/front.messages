@@ -253,6 +253,7 @@ class Messages
           if not currentMessage.usingModal
             currentMessage.domElement.remove()
           else
+            currentMessage.domElement.modal('hide')
             if (currentMessage.usingDefaultTemplate) # remove do DOM se tem um id default
               currentMessage.domElement.remove()
       @.changeContainerVisibility()
