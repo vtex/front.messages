@@ -38,5 +38,6 @@
     "livereload"
   ],
   "author": "Breno Calazans <breno@vtex.com.br>",
+  "owner": "Afonso Praça <afonso.praca@vtex.com.br>",
   "license": "MIT"
 }
