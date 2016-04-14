@@ -26,11 +26,11 @@ npm i
 grunt
 ```
 
-Você poderá vê-lo em ação em `http://localhost:9001/`.
+Você poderá vê-lo em ação em `http://localhost/front-messages-ui/`.
 
 ## API
 
-### Messages
+### MessagesK
 
 <h4 id="Messages()"><code>window.vtex.Messages.getInstance(customOptions)</code></h4>
 <p>Retorna a instância de Messages.</p>
