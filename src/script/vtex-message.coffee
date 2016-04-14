@@ -169,7 +169,7 @@ class Message
   ###
   hide: () =>
     if @usingModal
-      $(window).trigger('removeMessage.vtex', @id)
+      vtex.Messages.getInstance().removeMessage(@id)
     if !@usingModal
       @domElement.removeClass('vtex-front-messages-template-opened')
       if Modernizr? and Modernizr.csstransforms and Modernizr.csstransitions and Modernizr.opacity
@@ -179,7 +179,7 @@ class Message
         )
       else
         vtex.Messages.getInstance().removeMessage(@id)
-    vtex.Messages.getInstance().changeContainerVisibility()
+      vtex.Messages.getInstance().changeContainerVisibility()
 
 ###
 # Classe Messages, que agrupa todas as mensagens
