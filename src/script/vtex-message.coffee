@@ -16,7 +16,6 @@ class Message
       SEPARATOR: '.vtex-front-messages-separator'
       DETAIL: '.vtex-front-messages-detail'
       TYPE: 'vtex-front-messages-type-'
-      MESSAGEINSTANCE: 'vtex-front-messages-instance'
 
     defaultProperties =
       id: _.uniqueId('vtex-front-message-')
@@ -70,7 +69,7 @@ class Message
         if not $(@modalTemplate)[0] then throw new Error("Couldn't find specified template for Modal Message")
         @usingDefaultTemplate = false
       @domElement = $(@modalTemplate)
-      $(@domElement).addClass(@id + " " + @classes.MESSAGEINSTANCE + " " + @classes.TYPE + @type)
+      $(@domElement).addClass(@id + " " + @classes.TYPE + @type)
 
     # Se não usa modal
     if !@usingModal
@@ -82,7 +81,7 @@ class Message
         if not $(@template)[0] then throw new Error("Couldn't find specified template for Message")
         @usingDefaultTemplate = false
       @domElement = $(@template).clone(false, false)
-      $(@domElement).addClass(@id + " " + @classes.MESSAGEINSTANCE + " " + @classes.TYPE + @type)
+      $(@domElement).addClass(@id + " " + @classes.TYPE + @type)
 
     $(@domElement).data('vtex-message', @)
 
@@ -176,10 +175,11 @@ class Message
       if Modernizr? and Modernizr.csstransforms and Modernizr.csstransitions and Modernizr.opacity
         @domElement.bind("transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd", =>
           if not @domElement.hasClass('vtex-front-messages-template-opened')
-            $(window).trigger('removeMessage.vtex', @id)
+            vtex.Messages.getInstance().removeMessage(@id)
         )
       else
-        $(window).trigger('removeMessage.vtex', @id)
+        vtex.Messages.getInstance().removeMessage(@id)
+    vtex.Messages.getInstance().changeContainerVisibility()
 
 ###
 # Classe Messages, que agrupa todas as mensagens
@@ -256,7 +256,6 @@ class Messages
             currentMessage.domElement.modal('hide')
             if (currentMessage.usingDefaultTemplate) # remove do DOM se tem um id default
               currentMessage.domElement.remove()
-      @.changeContainerVisibility()
 
     ###
     # Reseta o timeout da mensagem que foi duplicada
@@ -297,9 +296,8 @@ class Messages
       for i in [@messagesArray.length - 1..0] by -1
         message = @messagesArray[i]
         if (message.usingModal is false) || (usingModal is true)
-          message.domElement.remove()
-          @messagesArray.splice(i,1)
-      @.changeContainerVisibility()
+          message.hide();
+      @.changeContainerVisibility(true)
 
     ###
     # Verifica se o container deve ser escondido, ele será escondido caso não hajam mensagens sendo exibidas
@@ -307,10 +305,10 @@ class Messages
     # @param
     # @return
     ###
-    changeContainerVisibility: ->
+    changeContainerVisibility: (isRemovingAll = false) ->
       notModalMessages = _.filter @messagesArray, (message) =>
         message.usingModal is false
-      if (notModalMessages.length is 0) and $(vtex.Messages.getInstance().placeholder).hasClass('vtex-front-messages-placeholder-opened')
+      if (notModalMessages.length <= 1 or isRemovingAll) and $(vtex.Messages.getInstance().placeholder).hasClass('vtex-front-messages-placeholder-opened')
         $(vtex.Messages.getInstance().placeholder).removeClass('vtex-front-messages-placeholder-opened');
 
     ###
@@ -394,7 +392,10 @@ class Messages
         $(window).on "addMessage.vtex", (evt, message) =>
           @addMessage(message)
         $(window).on "removeMessage.vtex", (evt, messageId) =>
-          @removeMessage(messageId)
+          for i in [@messagesArray.length - 1..0] by -1
+            currentMessage = @messagesArray[i]
+            if (currentMessage.id is messageId)
+              return currentMessage.hide()
         $(window).on "removeAllMessages.vtex", (evt, usingModal = false) =>
           @removeAllMessages(usingModal)
         $(".vtex-front-messages-close-all").on "click", (evt, usingModal = false) =>
