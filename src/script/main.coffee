@@ -35,7 +35,10 @@ $ ->
     type: 'info'
     timeout: 3000
 
-  $(window).trigger('addMessage', modalMessage);
+  $('.btn-warning').on 'click', ->
+    $(window).trigger 'addMessage', modalMessage
+    return
+
   $(window).trigger('addMessage', errorMessage);
   $(window).trigger('addMessage', warningMessage);
   $(window).trigger('addMessage', successMessage);
