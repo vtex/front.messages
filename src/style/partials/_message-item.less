@@ -1,36 +1,58 @@
 .vtex-front-messages-template {
-  padding: 8px 44px 8px 15px;
-  color: #555;
-  border-left: 3px solid #eea236;
-  display: none;
+  position: relative;
+  color: @gray-solid-b;
+  padding: 10px 44px 10px 14px;
+  border-left: 4px solid @yellow-matter-a;
+  left: -100%;
+  .opacity(0);
+  .main-transition();
 
+  // Individual messages opened state
   &.vtex-front-messages-template-opened {
-    display: block;
+    left: 0;
+    .opacity(100);
   }
 
-  &:last-of-type {
-    padding-bottom: 12px;
-  }
-
-  &:first-of-type {
-    padding-top: 14px;
-  }
-
+  //Message Variations
   &.vtex-front-messages-type-success {
-    border-color: #4cae4c;
+    border-color: @green-matter;
   }
 
   &.vtex-front-messages-type-info {
-    border-color: #46b8da;
-  }
-
-  &.vtex-front-messages-type-warning {
-    border-color: #eea236;
+    border-color: @blue-matter;
   }
 
   &.vtex-front-messages-type-danger,
   &.vtex-front-messages-type-fatal,
   &.vtex-front-messages-type-error {
-    border-color: #d43f3a;
+    border-color: @red-matter;
+  }
+}
+
+.vtex-front-messages-title {
+  font-weight: bold;
+}
+
+//Title Variations
+.vtex-front-messages-type-warning {
+  .vtex-front-messages-title {
+    color: @yellow-matter-a;
+  }
+}
+.vtex-front-messages-type-success {
+  .vtex-front-messages-title {
+    color: @green-matter;
+  }
+}
+.vtex-front-messages-type-info {
+  .vtex-front-messages-title {
+    color: @blue-matter;
+  }
+}
+.vtex-front-messages-type-danger,
+.vtex-front-messages-type-fatal,
+.vtex-front-messages-type-error {
+  .vtex-front-messages-title {
+    color: @red-matter;
   }
 }
