@@ -5,6 +5,7 @@ module.exports = (grunt) ->
 
   config = GruntVTEX.generateConfig grunt, pkg,
     replaceGlob: "build/**/vtex-message.js"
+    port: 9000
 
   # Add app files to coffe compilation and watch
   config.watch.coffee.files.push 'src/coffee/**/*.coffee'
@@ -20,7 +21,7 @@ module.exports = (grunt) ->
       files:
         'dist/vtex-message.min.js': ['build/front-messages-ui/script/vtex-message.js']
 
-  config.less.main.files[0].src = ['style.less', 'print.less', 'vtex-message.less']
+  config.less.main.files[0].src = ['style.less', 'vtex-messages.less']
 
   config.coffee.test =
     expand: true
@@ -34,7 +35,7 @@ module.exports = (grunt) ->
       files: [
         expand: true,
         cwd: "build/front-messages-ui/style/"
-        src: ['vtex-message.css'],
+        src: ['vtex-messages.css'],
         dest: 'dist/',
         ext: '.min.css'
       ]

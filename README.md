@@ -7,13 +7,13 @@ $(document).ready(function(){
 	messages = new window.vtex.Messages.getInstance({ajaxError:true});
 
 	message = {
-		content: 
+		content:
 			title: 'Erro!',
 			detail: 'Ocorreu um erro inesperado em nos nossos servidores.'
 		type: 'error'
 	};
-	
-	$(window).trigger('addMessage', message);	
+
+	$(window).trigger('addMessage', message);
 });
 ```
 ====
@@ -26,7 +26,7 @@ npm i
 grunt
 ```
 
-Você poderá vê-lo em ação em `http://localhost/front-messages-ui/`.
+Você poderá vê-lo em ação em `http://localhost:9000/front-messages-ui/`.
 
 ## API
 
@@ -49,8 +49,8 @@ Você poderá vê-lo em ação em `http://localhost/front-messages-ui/`.
 			<td>object</td>
 			<td>
 			{
-				ajaxError:true, 
-				placeholder: '.message-placeholder', 
+				ajaxError:true,
+				placeholder: '.message-placeholder',
 				modalPlaceholder: '.modal-placeholder'
 			}
 			</td>
@@ -63,15 +63,15 @@ Você poderá vê-lo em ação em `http://localhost/front-messages-ui/`.
 ```javascript
 // Modelo de customOptions para Messages
 {
-	ajaxError: 'define se o plugin deve tratar erros ajax', 
-	placeholder: 'define o elemento do DOM onde serão adicionadas as mensagens', 
+	ajaxError: 'define se o plugin deve tratar erros ajax',
+	placeholder: 'define o elemento do DOM onde serão adicionadas as mensagens',
 	modalPlaceholder: 'define o elemento do DOM onde serão adiconados os modais'
 }
 
 // Defaults
 {
-	ajaxError: true, 
-	placeholder: '.vtex-front-messages-placeholder', 
+	ajaxError: true,
+	placeholder: '.vtex-front-messages-placeholder',
 	modalPlaceholder: 'body'
 }
 ```
@@ -100,7 +100,7 @@ Você poderá vê-lo em ação em `http://localhost/front-messages-ui/`.
 			<td>messageId</td>
 			<td>String</td>
 			<td><code>'Payment-Unauthorized'</code></td>
-			<td>Parâmetro opcional, é um identificador para a mensagem, útil para o caso de ser necessário remover essa 
+			<td>Parâmetro opcional, é um identificador para a mensagem, útil para o caso de ser necessário remover essa
 			mensagem no futuro, programaticamente</td>
 		</tr>
 	</tbody>
