@@ -1,0 +1,47 @@
+.csstransforms.csstransitions.opacity {
+
+  .vtex-front-messages-placeholder {
+    display: block;
+
+    -webkit-transform: scale(0,0);
+    -moz-transform: scale(0,0);
+    -o-transform: scale(0,0);
+    -ms-transform: scale(0,0);
+    transform: scale(0,0);
+
+    -webkit-transform-origin: center top;
+    -moz-transform-origin: center top;
+    -o-transform-origin: center top;
+    -ms-transform-origin: center top;
+    transform-origin: center top;
+
+    -webkit-transition: transform 0.3s ease-in-out;
+    -moz-transition: transform 0.3s ease-in-out;
+    -o-transition: transform 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out;
+
+    &.vtex-front-messages-placeholder-opened {
+      -webkit-transform: scale(1,1);
+      -moz-transform: scale(1,1);
+      -o-transform: scale(1,1);
+      -ms-transform: scale(1,1);
+      transform: scale(1,1);
+    }
+  }
+
+  .vtex-front-messages-template {
+    display: block;
+    opacity: 0;
+    filter: alpha(opacity=0);
+
+    -webkit-transition: opacity 0.3s ease-in-out;
+    -moz-transition: opacity 0.3s ease-in-out;
+    -o-transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.3s ease-in-out;
+
+    &.vtex-front-messages-template-opened {
+      opacity: 1;
+      filter: alpha(opacity=100);
+    }
+  }
+}

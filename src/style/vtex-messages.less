@@ -1,126 +1,15 @@
-.vtex-front-messages-placeholder {
-  position: fixed;
-  background-color: #f5f5f5;
-  -webkit-box-shadow: 1px 1px 10px 1px #ccc;
-  -moz-box-shadow: 1px 1px 10px 1px #ccc;
-  box-shadow: 1px 1px 10px 1px #ccc;
-  z-index: 1040;
-  display: block;
+//----------------------------------*\
+// VARIABLES AND MIXINS
+//----------------------------------*/
 
-  &:empty {
-    display: none;
-  }
+@import "mixins/_variables";
+@import "mixins/_z-depth";
+@import "mixins/_utility-mixins";
 
-  @media (min-width:400px) {
-    top: 0;
-    left: 50%;
-    width: 400px;
-    margin-left: -200px;
-  }
-
-  @media (max-width:399px) {
-    top: 0;
-    left: 0;
-    width: 100%;
-    margin-left: 0;
-  }
-
-  &.vtex-front-messages-placeholder-opened {
-    display: block;
-  }
-
-  .vtex-front-messages-close-all{
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 2;
-    width: 44px;
-    height: 44px;
-    font-size: 30px;
-  }
-}
-
-.vtex-front-messages-template {
-  padding: 8px 44px 8px 15px;
-  color: #555;
-  border-left: 3px solid #eea236;
-  display: none;
-
-  &.vtex-front-messages-template-opened {
-    display: block;
-  }
-
-  &:last-of-type {
-    padding-bottom: 12px;
-  }
-
-  &:first-of-type {
-    padding-top: 14px;
-  }
-
-  &.vtex-front-messages-type-success {
-    border-color: #4cae4c;
-  }
-
-  &.vtex-front-messages-type-info {
-    border-color: #46b8da;
-  }
-
-  &.vtex-front-messages-type-warning {
-    border-color: #eea236;
-  }
-
-  &.vtex-front-messages-type-danger,
-  &.vtex-front-messages-type-fatal,
-  &.vtex-front-messages-type-error {
-    border-color: #d43f3a;
-  }
-}
-
-.csstransforms.csstransitions.opacity {
-
-  .vtex-front-messages-placeholder {
-    display: block;
-
-    -webkit-transform: scale(0,0);
-    -moz-transform: scale(0,0);
-    -o-transform: scale(0,0);
-    -ms-transform: scale(0,0);
-    transform: scale(0,0);
-
-    -webkit-transform-origin: center top;
-    -moz-transform-origin: center top;
-    -o-transform-origin: center top;
-    -ms-transform-origin: center top;
-    transform-origin: center top;
-
-    -webkit-transition: transform 0.3s ease-in-out;
-    -moz-transition: transform 0.3s ease-in-out;
-    -o-transition: transform 0.3s ease-in-out;
-    transition: transform 0.3s ease-in-out;
-
-    &.vtex-front-messages-placeholder-opened {
-      -webkit-transform: scale(1,1);
-      -moz-transform: scale(1,1);
-      -o-transform: scale(1,1);
-      -ms-transform: scale(1,1);
-      transform: scale(1,1);
-    }
-  }
-
-  .vtex-front-messages-template {
-    display: block;
-    opacity: 0;
-    filter: alpha(opacity=0);
-
-    -webkit-transition: opacity 0.3s ease-in-out;
-    -moz-transition: opacity 0.3s ease-in-out;
-    -o-transition: opacity 0.3s ease-in-out;
-    transition: opacity 0.3s ease-in-out;
-
-    &.vtex-front-messages-template-opened {
-      opacity: 1;
-      filter: alpha(opacity=100);
-    }
-  }
-}
+//----------------------------------*\
+// Partials
+//----------------------------------*/
+@import "partials/_message-placeholder";
+@import "partials/_message-item";
+@import "partials/_btn";
+@import "partials/_animations";
