@@ -31,8 +31,11 @@
     right: 5px;
     height: 22px;
     width: 22px;
-    opacity: .5;
+    opacity: .4;
     z-index: 2;
+    &:hover {
+      opacity: .8;
+    }
   }
 }
 
@@ -101,22 +104,6 @@
       -o-transform: scaleY(1);
       -ms-transform: scaleY(1);
       transform: scaleY(1);
-    }
-
-    .vtex-front-messages-close-all{
-      -webkit-transition: transform 0.2s ease-in-out;
-      -moz-transition: transform 0.2s ease-in-out;
-      -o-transition: transform 0.2s ease-in-out;
-      transition: transform 0.2s ease-in-out;
-      transform-origin: center;
-
-      &:hover {
-        -webkit-transform: rotate(90deg);
-        -moz-transform: translate(90deg);
-        -o-transform: translate(90deg);
-        -ms-transform: translate(90deg);
-        transform: translate(90deg);
-      }
     }
   }
 
