@@ -500,7 +500,7 @@
 
 
       VtexMessages.prototype.buildPlaceholderTemplate = function() {
-        return $(".vtex-front-messages-placeholder").append("<button type=\"button\" class=\"vtex-front-messages-close-all close\">×</button>");
+        return $(".vtex-front-messages-placeholder").append("<button type=\"button\" class=\"vtex-front-messages-close-all close\"><svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\" viewBox=\"0 0 16 16\" xml:space=\"preserve\" width=\"22\" height=\"22\"><g class=\"nc-icon-wrapper\" fill=\"#111111\"><line fill=\"none\" stroke=\"#111111\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" x1=\"11.5\" y1=\"4.5\" x2=\"4.5\" y2=\"11.5\"></line> <line fill=\"none\" stroke=\"#111111\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" x1=\"4.5\" y1=\"4.5\" x2=\"11.5\" y2=\"11.5\"></line></g></svg></button>");
       };
 
       /*

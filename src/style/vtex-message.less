@@ -29,12 +29,12 @@
     position: absolute;
     top: 8px;
     right: 5px;
+    height: 22px;
+    width: 22px;
+    opacity: .4;
     z-index: 2;
-    @media (min-width:400px) {
-      font-size: 20px;
-    }
-    @media (max-width:399px) {
-      font-size: 32px;
+    &:hover {
+      opacity: .8;
     }
   }
 }
@@ -104,21 +104,6 @@
       -o-transform: scaleY(1);
       -ms-transform: scaleY(1);
       transform: scaleY(1);
-    }
-
-    .vtex-front-messages-close-all{
-      -webkit-transition: all 0.2s ease-in-out;
-      -moz-transition: all 0.2s ease-in-out;
-      -o-transition: all 0.2s ease-in-out;
-      transition: all 0.2s ease-in-out;
-
-      &:hover {
-        -webkit-transform: rotate(90deg);
-        -moz-transform: translate(90deg);
-        -o-transform: translate(90deg);
-        -ms-transform: translate(90deg);
-        transform: translate(90deg);
-      }
     }
   }
 

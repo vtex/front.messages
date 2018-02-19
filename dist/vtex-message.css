@@ -30,17 +30,10 @@
   position: absolute;
   top: 8px;
   right: 5px;
+  height: 22px;
+  width: 22px;
+  opacity: .5;
   z-index: 2;
-}
-@media (min-width: 400px) {
-  .vtex-front-messages-placeholder .vtex-front-messages-close-all {
-    font-size: 20px;
-  }
-}
-@media (max-width: 399px) {
-  .vtex-front-messages-placeholder .vtex-front-messages-close-all {
-    font-size: 32px;
-  }
 }
 .vtex-front-messages-template {
   padding: 8px 20px 8px 15px;
@@ -96,10 +89,11 @@
   transform: scaleY(1);
 }
 .csstransforms.csstransitions.opacity .vtex-front-messages-placeholder .vtex-front-messages-close-all {
-  -webkit-transition: all 0.2s ease-in-out;
-  -moz-transition: all 0.2s ease-in-out;
-  -o-transition: all 0.2s ease-in-out;
-  transition: all 0.2s ease-in-out;
+  -webkit-transition: transform 0.2s ease-in-out;
+  -moz-transition: transform 0.2s ease-in-out;
+  -o-transition: transform 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out;
+  transform-origin: center;
 }
 .csstransforms.csstransitions.opacity .vtex-front-messages-placeholder .vtex-front-messages-close-all:hover {
   -webkit-transform: rotate(90deg);
