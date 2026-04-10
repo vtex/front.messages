@@ -1,0 +1,18 @@
+- name: front.messages
+  referenceId: PLACEHOLDER
+  description: SonarQube scan for front.messages
+  build:
+    provider: dkcicd
+    pipelines:
+      - name: node-ci-v2
+        parameters:
+          sonarProjectName: front.messages
+          nodeVersion: 20-bookworm
+        runtime:
+          architecture: amd64
+        when:
+          - event: pull_request
+            source: branch
+          - event: push
+            source: branch
+            regex: master
