@@ -39,5 +39,8 @@
   ],
   "author": "Breno Calazans <breno@vtex.com.br>",
   "owner": "Afonso Praça <afonso.praca@vtex.com.br>",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "test:coverage": "echo \"no tests\" && exit 0"
+  }
 }
